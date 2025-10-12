@@ -20,5 +20,6 @@ public class Election {
     private final String election;
     @DateTimeFormat
     private final Date date;
+    private final String contractAddress;
 
 }

@@ -32,6 +32,9 @@ public class Voter {
     @NotBlank
     @Pattern(regexp="^[0-9]{10}$")
     private long phoneNumber;
+    @NotNull
+    @NotBlank
+    private String voterAddress; // Blockchain wallet address
 
     private String password;
 

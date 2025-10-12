@@ -107,6 +107,32 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+
+			<plugin>
+				<groupId>org.web3j</groupId>
+				<artifactId>web3j-maven-plugin</artifactId>
+
+				<configuration>
+					<packageName>com.kathir.demo.contracts</packageName>
+					<sourceDestination>src/main/java/com/kathir/demo/contracts</sourceDestination>
+					<soliditySourceFiles>
+						<directory>src/main/java/com/kathir/demo</directory>
+						<includes>
+							<include>SimpleVote.sol</include>
+						</includes>
+					</soliditySourceFiles>
+				</configuration>
+				<executions>
+					<execution>
+						<id>generate-sources</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>generate-sources</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 
