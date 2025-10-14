@@ -2,6 +2,7 @@ package com.kathir.demo.service;
 
 import com.kathir.demo.contracts.SimpleVote;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
@@ -14,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 @Service
 @Data
 public class VotingService {
+
     private final Web3j web3j;
     private final Credentials credentials;
     private final ContractGasProvider gasProvider;

@@ -95,7 +95,7 @@
 		<dependency>
 			<groupId>org.web3j</groupId>
 			<artifactId>core</artifactId>
-			<version>4.8.4</version>
+			<version>4.14.0</version>
 		</dependency>
 
 
@@ -111,10 +111,11 @@
 			<plugin>
 				<groupId>org.web3j</groupId>
 				<artifactId>web3j-maven-plugin</artifactId>
+				<version> 4.14.0</version>
 
 				<configuration>
-					<packageName>com.kathir.demo.contracts</packageName>
-					<sourceDestination>src/main/java/com/kathir/demo/contracts</sourceDestination>
+					<packageName>contracts</packageName>
+					<sourceDestination>src/main/java/com/kathir/demo</sourceDestination>
 					<soliditySourceFiles>
 						<directory>src/main/java/com/kathir/demo</directory>
 						<includes>

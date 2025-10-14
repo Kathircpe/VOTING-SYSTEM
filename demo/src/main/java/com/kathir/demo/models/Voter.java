@@ -1,9 +1,6 @@
-package com.kathir.demo.modules;
+package com.kathir.demo.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,34 +8,46 @@ import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
 @Entity
-@Builder
-public class Admin {
+@AllArgsConstructor
+@NoArgsConstructor
+public class Voter {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @NotNull
     @NotBlank
     private String name;
+    @NotNull
+    @NotBlank
+    private Integer age;
+
+    private boolean hasVoted =false;
+
+    private boolean isEnabled =false;
+    @NotNull
+    @NotBlank
     @Email
     private String email;
     @NotNull
     @NotBlank
     @Pattern(regexp="^[0-9]{10}$")
-    private long phoneNumber;
+    private String phoneNumber;
+    @NotNull
+    @NotBlank
+    private String voterAddress; // Blockchain wallet address
 
     private String password;
 
     private String otp;
 
-    private LocalDateTime otpExpiry;
-
-
+    @DateTimeFormat
+    private LocalDateTime expiration;
 }
-

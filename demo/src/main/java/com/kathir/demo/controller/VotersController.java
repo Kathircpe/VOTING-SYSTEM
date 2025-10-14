@@ -1,6 +1,6 @@
 package com.kathir.demo.controller;
 
-import com.kathir.demo.modules.Candidate;
+import com.kathir.demo.models.Candidate;
 import com.kathir.demo.service.VoterService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;

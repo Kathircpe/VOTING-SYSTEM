@@ -15,10 +15,10 @@ import org.springframework.security.web.authentication.*;
 public class SecurityConfiguration {
 
     @Autowired
-    private JwtFilter jwtFilter;
+    private  JwtFilter jwtFilter;
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder()throws Exception {
         return new BCryptPasswordEncoder();
     }
 
@@ -35,10 +35,8 @@ public class SecurityConfiguration {
 //        http
 //                .csrf(AbstractHttpConfigurer::disable)
 //                .authorizeHttpRequests((auth) -> auth
-//                        .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html")
-//                        .permitAll()
-//                        .anyRequest()
-//                        .authenticated()
+//                        .requestMatchers("/auth/**").permitAll()
+//                        .anyRequest().authenticated()
 //                )
 //                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 //        return http.build();

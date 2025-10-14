@@ -22,7 +22,7 @@ public class Web3jConfiguration {
 
     @Bean
     public Credentials credentials() throws Exception {
-        return WalletUtils.loadCredentials("<password>", "<path-to-keystore-or-pk>"); // or use RawTransactionManager
+        return Credentials.create("73295e3f1414a9fdf4158c9a53966ea73d6429fe88bfdfddba84b30c07354d48");
     }
     @Bean
     public DefaultGasProvider gasProvider(){

@@ -19,11 +19,9 @@ public class JwtUtil {
 
     private final Key secretKey = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 
-    private final long EXPIRATION = 1000 * 60 * 10;
-
     public String generateToken(String email) {
 
-
+        long EXPIRATION = 1000 * 60 * 15;
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))

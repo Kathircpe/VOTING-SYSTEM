@@ -1,6 +1,6 @@
 package com.kathir.demo.service;
 
-import com.kathir.demo.modules.Election;
+import com.kathir.demo.models.Election;
 import com.kathir.demo.repository.ElectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
