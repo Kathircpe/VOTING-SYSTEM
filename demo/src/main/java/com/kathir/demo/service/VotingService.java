@@ -2,7 +2,6 @@ package com.kathir.demo.service;
 
 import com.kathir.demo.contracts.SimpleVote;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;

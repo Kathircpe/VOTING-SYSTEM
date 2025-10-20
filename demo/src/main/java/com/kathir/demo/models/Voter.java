@@ -25,8 +25,7 @@ public class Voter {
     @NotNull
     @NotBlank
     private String name;
-    @NotNull
-    @NotBlank
+
     private Integer age;
 
     private boolean hasVoted =false;

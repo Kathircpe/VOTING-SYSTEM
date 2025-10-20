@@ -23,18 +23,30 @@ public class AuthController {
       return adminService.adminLogin(body);
     }
 
+    @PostMapping("/ad/{email}")
+    public void adminOtpSender(@PathVariable String email) {
+
+        adminService.otpSender(email);
+    }
+
 
 
     @PostMapping("/vo/registration")
-    public ResponseEntity<?> voterRegistration(@RequestBody Map<String,String> body) {
+    public ResponseEntity<String> voterRegistration(@RequestBody Map<String,String> body) {
 
         return voterService.voterRegistration(body);
     }
 
     @PostMapping("/vo/verification")
-    public String voterVerification(@RequestBody Map<String,String> body) {
+    public ResponseEntity<String> voterVerification(@RequestBody Map<String,String> body) {
 
        return voterService.voterVerification(body);
+    }
+
+    @PostMapping("/vo/{email}")
+    public void voterOtpSender(@PathVariable String email){
+
+         voterService.otpSender(email);
     }
 
     @PostMapping("/vo/login")

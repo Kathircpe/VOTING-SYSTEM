@@ -8,6 +8,7 @@ import com.kathir.demo.repository.CandidateRepository;
 import com.kathir.demo.repository.ElectionRepository;
 import com.kathir.demo.utils.JwtUtil;
 import com.kathir.demo.utils.OtpUtil;
+import jakarta.transaction.Transactional;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.kathir.demo.repository.AdminRepository;
@@ -58,8 +60,27 @@ public class AdminService {
         if (!passwordEncoder.matches(password, admin.getPassword())) {
             return new ResponseEntity<>("The wrong password", HttpStatus.UNAUTHORIZED);
         }
-        String token = jwtUtil.generateToken(email);
-        return ResponseEntity.ok(Map.of("token", token));
+        else if(body.containsKey("otp")&&!body.get("otp").equals(admin.getOtp())){
+            return new ResponseEntity<>("The wrong otp", HttpStatus.UNAUTHORIZED);
+        }
+
+            String token = jwtUtil.generateToken(email);
+            return ResponseEntity.ok(Map.of("token", token));
+
+
+
+    }
+
+    public void otpSender(String email) {
+        Optional<Admin> adminOptional=adminRepository.findByEmail(email);
+        if(adminOptional.isPresent()) {
+            Admin admin =adminOptional.get();
+            String otp = otpUtil.generateOtp();
+            otpService.sendOtp(admin.getEmail(), otp);
+            admin.setOtp(otp);
+            admin.setExpiration(LocalDateTime.now().plusMinutes(15));
+            adminRepository.save(admin);
+        }
 
     }
 

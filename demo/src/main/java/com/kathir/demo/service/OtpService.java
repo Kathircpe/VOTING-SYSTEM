@@ -15,7 +15,7 @@ public class OtpService {
         SimpleMailMessage msg=new SimpleMailMessage();
         msg.setTo(toEmail);
         msg.setSubject("Otp for voter's portal registration");
-        msg.setText("Your Otp "+otp+". It expires in 5 minutes");
+        msg.setText("Your Otp  voter's portal registration "+otp+". It expires in 15 minutes");
         mailSender.send(msg);
     }
 
