@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface VoterRepository extends JpaRepository<Voter,Long> {
 
     Optional<Voter> findByEmail(String email);
-
+    Optional<Voter> findByVoterAddress(String voterAddress);
 
 
 }

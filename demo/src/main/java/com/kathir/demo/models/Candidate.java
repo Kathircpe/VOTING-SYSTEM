@@ -21,8 +21,9 @@ public class Candidate {
     @NotNull
     @NotBlank
     private String name;
-
-    private Integer constituency;
+    @NotNull
+    @NotBlank
+    private String constituency;
     @NotNull
     @NotBlank
     private String partyName;

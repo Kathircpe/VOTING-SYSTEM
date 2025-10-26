@@ -5,51 +5,57 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.kathir.demo.service.AdminService;
 
+import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Data
 @RestController
 @RequestMapping("/api/v1/admin")
 @Slf4j
 public  class AdminController {
-    private final  int pageSize =10;
+        private final static int PAGE_SIZE =10;
         @Autowired
         private final AdminService adminService;
 
-        @GetMapping("/createElection")
-        private String createElection(@RequestBody Map<String,String> body){
+        @PostMapping("/createElection")
+        private ResponseEntity<String> createElection(@RequestBody Map<String,String> body) throws Exception {
             return adminService.createElection(body);
         }
 
-        @GetMapping("/updateElection")
+        @PatchMapping("/updateElection")
         private String updateElection(@RequestBody Map<String,String> body){
             return adminService.updateElection(body);
         }
-        @GetMapping("/deleteElection/{id}")
+
+        @DeleteMapping("/deleteElection/{id}")
         private String deleteElection(@RequestParam int id){
             return adminService.deleteElection(id);
         }
-        @GetMapping("/createCandidate")
+
+        @PostMapping("/createCandidate")
         private String createCandidate(@RequestBody Map<String,String> body){
             return adminService.createCandidate(body);
         }
 
-        @GetMapping("/updateCandidate")
+        @PatchMapping("/updateCandidate")
         private String updateCandidate(@RequestBody Map<String,String> body){
             return adminService.updateCandidate(body);
         }
-        @GetMapping("/deleteCandidate/{id}")
-        private String deleteCandidate(@RequestParam int id){
+
+        @DeleteMapping("/deleteCandidate/{id}")
+        private String deleteCandidate(@PathVariable int id){
             return adminService.deleteCandidate(id);
         }
 
-
-        @GetMapping("/getVoters")
-        private Page<Voter> getVoters(@RequestParam int page){
-            return adminService.getAllVoters(page,pageSize);
+        @GetMapping("/getVoters/{page}")
+        private Page<Voter> getVoters(@PathVariable int page){
+            return adminService.getAllVoters(page, PAGE_SIZE);
         }
 
         @GetMapping("/getVoter/{id}")
@@ -57,6 +63,15 @@ public  class AdminController {
             return adminService.getVoterById(id);
         }
 
+        @GetMapping("/getVotesForAll")
+        private List<CompletableFuture<BigInteger>> getVotesOfAllCandidatesAsync(@PathVariable String contractAddress){
+            return adminService.getVotesOfAllCandidatesAsync(contractAddress);
+        }
+
+        @GetMapping("/getVotes")
+        private CompletableFuture<BigInteger> getVotesAsync(@RequestBody Map<String,String> body){
+            return adminService.getVotesAsync(body);
+        }
 
 
 }

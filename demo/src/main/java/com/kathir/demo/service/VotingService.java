@@ -1,6 +1,8 @@
 package com.kathir.demo.service;
 
-import com.kathir.demo.contracts.SimpleVote;
+import com.kathir.demo.contracts.VotingContract;
+import com.kathir.demo.models.Candidate;
+import com.kathir.demo.repository.CandidateRepository;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.Credentials;
@@ -9,6 +11,9 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.gas.ContractGasProvider;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -18,70 +23,15 @@ public class VotingService {
     private final Web3j web3j;
     private final Credentials credentials;
     private final ContractGasProvider gasProvider;
-
-
-
-    /**
-     * Deploy a new voting contract asynchronously
-     * @return CompletableFuture with contract address
-     */
-    public CompletableFuture<String> deployAsync() {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                SimpleVote contract = SimpleVote.deploy(web3j, credentials, gasProvider).send();
-                return contract.getContractAddress();
-            } catch (Exception e) {
-                throw new RuntimeException("Error deploying contract: " + e.getMessage(), e);
-            }
-        });
-    }
-
-    /**
-     * Deploy a new voting contract
-     * @return Contract address
-     * @throws Exception if deployment fails
-     */
-    public String deploy() throws Exception {
-        SimpleVote contract = SimpleVote.deploy(web3j, credentials, gasProvider).send();
-        return contract.getContractAddress();
-    }
+    private final CandidateRepository candidateRepository;
 
     /**
      * Load an existing contract
      * @param address Contract address
      * @return SimpleVote contract instance
      */
-    private SimpleVote load(String address) {
-        return SimpleVote.load(address, web3j, credentials, gasProvider);
-    }
-
-    /**
-     * Vote for a candidate asynchronously
-     * @param contractAddress Address of the voting contract
-     * @param candidateId ID of the candidate to vote for
-     * @return CompletableFuture with transaction hash
-     */
-    public CompletableFuture<String> voteAsync(String contractAddress, long candidateId) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                return vote(contractAddress, candidateId);
-            } catch (Exception e) {
-                throw new RuntimeException("Error casting vote: " + e.getMessage(), e);
-            }
-        });
-    }
-
-    /**
-     * Vote for a candidate
-     * @param contractAddress Address of the voting contract
-     * @param candidateId ID of the candidate to vote for
-     * @return Transaction hash
-     * @throws Exception if voting fails
-     */
-    public String vote(String contractAddress, long candidateId) throws Exception {
-        SimpleVote contract = load(contractAddress);
-        TransactionReceipt receipt = contract.vote(BigInteger.valueOf(candidateId)).send();
-        return receipt.getTransactionHash();
+    public VotingContract load(String address) {
+        return VotingContract.load(address, web3j, credentials, gasProvider);
     }
 
     /**
@@ -108,19 +58,26 @@ public class VotingService {
      * @throws Exception if getting votes fails
      */
     public BigInteger getVotes(String contractAddress, long candidateId) throws Exception {
-        SimpleVote contract = load(contractAddress);
+        VotingContract contract = load(contractAddress);
         return contract.getVotes(BigInteger.valueOf(candidateId)).send();
     }
 
-    /**
-     * Check if an address has already voted
-     * @param contractAddress Address of the voting contract
-     * @param voterAddress Address of the voter
-     * @return True if voter has already voted, false otherwise
-     * @throws Exception if checking vote status fails
-     */
-    public boolean hasVoted(String contractAddress, String voterAddress) throws Exception {
-        SimpleVote contract = load(contractAddress);
-        return contract.hasVoted(voterAddress).send();
+
+    public CompletableFuture<BigInteger> getVotesAsync(Map<String,String> body){
+        String contractAddress=body.get("contractAddress");
+        long candidateId=Long.parseLong(body.get("candidateId"));
+        return getVotesAsync(contractAddress,candidateId);
     }
+    public List<CompletableFuture<BigInteger>> getVotesOfAllCandidatesAsync(String contractAddress ){
+        List<CompletableFuture<BigInteger>> list= new ArrayList<>();
+        List<Candidate> candidates=candidateRepository.findAll();
+
+        for(Candidate candidate:candidates){
+            list.add(getVotesAsync(Map.of("contractAddress",contractAddress)));
+        }
+
+        return list;
+    }
+
+
 }

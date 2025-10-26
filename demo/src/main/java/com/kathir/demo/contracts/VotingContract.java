@@ -37,7 +37,7 @@ import org.web3j.tx.gas.ContractGasProvider;
  * <p>Generated with web3j version 4.14.0.
  */
 @SuppressWarnings("rawtypes")
-public class SimpleVote extends Contract {
+public class VotingContract extends Contract {
     public static final String BINARY = "6080604052348015600e575f5ffd5b506102598061001c5f395ff3fe608060405234801561000f575f5ffd5b506004361061004a575f3560e01c80630121b93f1461004e57806309eef43e146100635780634fc8a20d1461009a578063ff981099146100c7575b5f5ffd5b61006161005c3660046101ba565b6100e6565b005b6100856100713660046101d1565b60016020525f908152604090205460ff1681565b60405190151581526020015b60405180910390f35b6100b96100a83660046101ba565b5f6020819052908152604090205481565b604051908152602001610091565b6100b96100d53660046101ba565b5f9081526020819052604090205490565b335f9081526001602052604090205460ff16156101395760405162461bcd60e51b815260206004820152600d60248201526c105b1c9958591e481d9bdd1959609a1b604482015260640160405180910390fd5b335f908152600160208181526040808420805460ff19168417905584845290839052822080549192909161016e9084906101fe565b90915550505f8181526020818152604091829020549151918252829133917fea66f58e474bc09f580000e81f31b334d171db387d0c6098ba47bd897741679b910160405180910390a350565b5f602082840312156101ca575f5ffd5b5035919050565b5f602082840312156101e1575f5ffd5b81356001600160a01b03811681146101f7575f5ffd5b9392505050565b8082018082111561021d57634e487b7160e01b5f52601160045260245ffd5b9291505056fea2646970667358221220af283f2f68a1b0d0b483e6285f08477cf809d3c4a1467e9525af6c83b4d0a79e64736f6c634300081d0033";
 
     private static String librariesLinkedBinary;
@@ -55,24 +55,24 @@ public class SimpleVote extends Contract {
     ;
 
     @Deprecated
-    protected SimpleVote(String contractAddress, Web3j web3j, Credentials credentials,
-            BigInteger gasPrice, BigInteger gasLimit) {
+    protected VotingContract(String contractAddress, Web3j web3j, Credentials credentials,
+                             BigInteger gasPrice, BigInteger gasLimit) {
         super(BINARY, contractAddress, web3j, credentials, gasPrice, gasLimit);
     }
 
-    protected SimpleVote(String contractAddress, Web3j web3j, Credentials credentials,
-            ContractGasProvider contractGasProvider) {
+    protected VotingContract(String contractAddress, Web3j web3j, Credentials credentials,
+                             ContractGasProvider contractGasProvider) {
         super(BINARY, contractAddress, web3j, credentials, contractGasProvider);
     }
 
     @Deprecated
-    protected SimpleVote(String contractAddress, Web3j web3j, TransactionManager transactionManager,
-            BigInteger gasPrice, BigInteger gasLimit) {
+    protected VotingContract(String contractAddress, Web3j web3j, TransactionManager transactionManager,
+                             BigInteger gasPrice, BigInteger gasLimit) {
         super(BINARY, contractAddress, web3j, transactionManager, gasPrice, gasLimit);
     }
 
-    protected SimpleVote(String contractAddress, Web3j web3j, TransactionManager transactionManager,
-            ContractGasProvider contractGasProvider) {
+    protected VotingContract(String contractAddress, Web3j web3j, TransactionManager transactionManager,
+                             ContractGasProvider contractGasProvider) {
         super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider);
     }
 
@@ -141,47 +141,47 @@ public class SimpleVote extends Contract {
     }
 
     @Deprecated
-    public static SimpleVote load(String contractAddress, Web3j web3j, Credentials credentials,
-            BigInteger gasPrice, BigInteger gasLimit) {
-        return new SimpleVote(contractAddress, web3j, credentials, gasPrice, gasLimit);
+    public static VotingContract load(String contractAddress, Web3j web3j, Credentials credentials,
+                                      BigInteger gasPrice, BigInteger gasLimit) {
+        return new VotingContract(contractAddress, web3j, credentials, gasPrice, gasLimit);
     }
 
     @Deprecated
-    public static SimpleVote load(String contractAddress, Web3j web3j,
-            TransactionManager transactionManager, BigInteger gasPrice, BigInteger gasLimit) {
-        return new SimpleVote(contractAddress, web3j, transactionManager, gasPrice, gasLimit);
+    public static VotingContract load(String contractAddress, Web3j web3j,
+                                      TransactionManager transactionManager, BigInteger gasPrice, BigInteger gasLimit) {
+        return new VotingContract(contractAddress, web3j, transactionManager, gasPrice, gasLimit);
     }
 
-    public static SimpleVote load(String contractAddress, Web3j web3j, Credentials credentials,
-            ContractGasProvider contractGasProvider) {
-        return new SimpleVote(contractAddress, web3j, credentials, contractGasProvider);
+    public static VotingContract load(String contractAddress, Web3j web3j, Credentials credentials,
+                                      ContractGasProvider contractGasProvider) {
+        return new VotingContract(contractAddress, web3j, credentials, contractGasProvider);
     }
 
-    public static SimpleVote load(String contractAddress, Web3j web3j,
-            TransactionManager transactionManager, ContractGasProvider contractGasProvider) {
-        return new SimpleVote(contractAddress, web3j, transactionManager, contractGasProvider);
+    public static VotingContract load(String contractAddress, Web3j web3j,
+                                      TransactionManager transactionManager, ContractGasProvider contractGasProvider) {
+        return new VotingContract(contractAddress, web3j, transactionManager, contractGasProvider);
     }
 
-    public static RemoteCall<SimpleVote> deploy(Web3j web3j, Credentials credentials,
-            ContractGasProvider contractGasProvider) {
-        return deployRemoteCall(SimpleVote.class, web3j, credentials, contractGasProvider, getDeploymentBinary(), "");
-    }
-
-    @Deprecated
-    public static RemoteCall<SimpleVote> deploy(Web3j web3j, Credentials credentials,
-            BigInteger gasPrice, BigInteger gasLimit) {
-        return deployRemoteCall(SimpleVote.class, web3j, credentials, gasPrice, gasLimit, getDeploymentBinary(), "");
-    }
-
-    public static RemoteCall<SimpleVote> deploy(Web3j web3j, TransactionManager transactionManager,
-            ContractGasProvider contractGasProvider) {
-        return deployRemoteCall(SimpleVote.class, web3j, transactionManager, contractGasProvider, getDeploymentBinary(), "");
+    public static RemoteCall<VotingContract> deploy(Web3j web3j, Credentials credentials,
+                                                    ContractGasProvider contractGasProvider) {
+        return deployRemoteCall(VotingContract.class, web3j, credentials, contractGasProvider, getDeploymentBinary(), "");
     }
 
     @Deprecated
-    public static RemoteCall<SimpleVote> deploy(Web3j web3j, TransactionManager transactionManager,
-            BigInteger gasPrice, BigInteger gasLimit) {
-        return deployRemoteCall(SimpleVote.class, web3j, transactionManager, gasPrice, gasLimit, getDeploymentBinary(), "");
+    public static RemoteCall<VotingContract> deploy(Web3j web3j, Credentials credentials,
+                                                    BigInteger gasPrice, BigInteger gasLimit) {
+        return deployRemoteCall(VotingContract.class, web3j, credentials, gasPrice, gasLimit, getDeploymentBinary(), "");
+    }
+
+    public static RemoteCall<VotingContract> deploy(Web3j web3j, TransactionManager transactionManager,
+                                                    ContractGasProvider contractGasProvider) {
+        return deployRemoteCall(VotingContract.class, web3j, transactionManager, contractGasProvider, getDeploymentBinary(), "");
+    }
+
+    @Deprecated
+    public static RemoteCall<VotingContract> deploy(Web3j web3j, TransactionManager transactionManager,
+                                                    BigInteger gasPrice, BigInteger gasLimit) {
+        return deployRemoteCall(VotingContract.class, web3j, transactionManager, gasPrice, gasLimit, getDeploymentBinary(), "");
     }
 
     public static void linkLibraries(List<Contract.LinkReference> references) {

@@ -1,5 +1,7 @@
 package com.kathir.demo.service;
 
+
+import com.kathir.demo.contracts.VotingContract;
 import com.kathir.demo.models.Admin;
 import com.kathir.demo.models.Candidate;
 import com.kathir.demo.models.Election;
@@ -8,7 +10,6 @@ import com.kathir.demo.repository.CandidateRepository;
 import com.kathir.demo.repository.ElectionRepository;
 import com.kathir.demo.utils.JwtUtil;
 import com.kathir.demo.utils.OtpUtil;
-import jakarta.transaction.Transactional;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,15 +17,22 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.kathir.demo.repository.AdminRepository;
 import com.kathir.demo.repository.VoterRepository;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.web3j.crypto.Credentials;
+import org.web3j.protocol.Web3j;
+import org.web3j.tx.gas.ContractGasProvider;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Data
 @Service
@@ -35,10 +43,16 @@ public class AdminService {
     private final VoterRepository voterRepository;
     private final ElectionRepository electionRepository;
     private final CandidateRepository candidateRepository;
+
     private final OtpUtil otpUtil;
     private final OtpService otpService;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final VotingService votingService;
+
+    private final Web3j web3j;
+    private final Credentials credentials;
+    private final ContractGasProvider gasProvider;
 
     public Page<Voter> getAllVoters(int page,int size){
         Pageable pageable= PageRequest.of(page,size);
@@ -84,19 +98,28 @@ public class AdminService {
 
     }
 
-    public String createElection(Map<String, String> body) {
+    public ResponseEntity<String> createElection(Map<String, String> body) throws Exception {
 
-        LocalDateTime from=LocalDateTime.parse(body.get("from"));
-        LocalDateTime to=LocalDateTime.parse(body.get("to"));
-        String name=body.get("electionName");
-        String contractAddress=body.get("contractAddress");
-        Election election=new Election();
-        election.setEndDate(to);
-        election.setStartDate(from);
-        election.setElectionName(name);
-        election.setContractAddress(contractAddress);
-        electionRepository.save(election);
-        return "successfully created an election";
+        try{
+            LocalDateTime from=LocalDateTime.parse(body.get("from"));
+            LocalDateTime to=LocalDateTime.parse(body.get("to"));
+            String name=body.get("electionName");
+            Election election=new Election();
+            election.setEndDate(to);
+            election.setStartDate(from);
+            election.setElectionName(name);
+            election.setContractAddress(deploy());
+            electionRepository.save(election);
+            //marking hasVoted as false for all voters
+            List<Voter> voters=voterRepository.findAll();
+            for(Voter voter:voters){
+                voter.setHasVoted(false);
+                voterRepository.save(voter);
+            }
+            return new ResponseEntity<>("successfully created an election",HttpStatus.CREATED);
+        }catch(Exception e){
+            return new ResponseEntity<>("error can't create an election",HttpStatus.BAD_REQUEST);
+        }
 
     }
 
@@ -133,7 +156,7 @@ public class AdminService {
     public String createCandidate(Map<String, String> body) {
         String partyName=body.get("partyName");
         String name=body.get("name");
-        int constituency=Integer.parseInt(body.get("constituency"));
+        String constituency=body.get("constituency");
         Candidate candidate=new Candidate();
         candidate.setName(name);
         candidate.setPartyName(partyName);
@@ -151,7 +174,7 @@ public class AdminService {
             for(String key:body.keySet()){
                 switch(key){
                     case "name" ->candidate.setName(body.get(key));
-                    case "constituency" ->candidate.setConstituency(Integer.parseInt(body.get(key)));
+                    case "constituency" ->candidate.setConstituency(body.get(key));
                     case "partyName" ->candidate.setPartyName(body.get(key));
                 }
             }
@@ -169,4 +192,39 @@ public class AdminService {
         }
         return "No candidate found for the provided id";
     }
+
+    /**
+     * Deploy a new voting contract asynchronously
+     * @return CompletableFuture with contract address
+     */
+    public CompletableFuture<String> deployAsync() {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                VotingContract contract = VotingContract.deploy(web3j, credentials, gasProvider).send();
+                return contract.getContractAddress();
+            } catch (Exception e) {
+                throw new RuntimeException("Error deploying contract: " + e.getMessage(), e);
+            }
+        });
+    }
+
+    /**
+     * Deploy a new voting contract
+     * @return Contract address
+     * @throws Exception if deployment fails
+     */
+    public String deploy() throws Exception {
+        VotingContract contract = VotingContract.deploy(web3j, credentials, gasProvider).send();
+        return contract.getContractAddress();
+    }
+
+    public CompletableFuture<BigInteger> getVotesAsync( Map<String,String> body){
+        return votingService.getVotesAsync(body);
+    }
+
+    public List<CompletableFuture<BigInteger>> getVotesOfAllCandidatesAsync(String contractAddress){
+        return votingService.getVotesOfAllCandidatesAsync(contractAddress);
+    }
+
+
 }

@@ -1,6 +1,7 @@
 package com.kathir.demo.configuration;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.web3j.crypto.Credentials;
@@ -12,24 +13,23 @@ import org.web3j.tx.gas.DefaultGasProvider;
 @Configuration
 public class Web3jConfiguration {
 
-     public static final String address="0x00000000219ab540356cBB839Cbe05303d7705Fa";
+
 
     // Config
     @Bean
-    public Web3j web3j() {
-        return Web3j.build(new HttpService("https://mainnet.infura.io/v3/3a40f40937c64c64bb77fe936fee178c"));
+    public Web3j web3j(@Value("${web3.rpc-url}") String rpcUrl) {
+        return Web3j.build(new HttpService(rpcUrl));
     }
 
     @Bean
-    public Credentials credentials() throws Exception {
-        return Credentials.create("73295e3f1414a9fdf4158c9a53966ea73d6429fe88bfdfddba84b30c07354d48");
+    public Credentials credentials(@Value("${web3.private-key}") String privateKey) throws Exception {
+        return Credentials.create(privateKey);
     }
+
     @Bean
-    public DefaultGasProvider gasProvider(){
+    public DefaultGasProvider gasProvider() {
         return new DefaultGasProvider();
     }
-
-
 
 
 }
