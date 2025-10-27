@@ -2,14 +2,17 @@ package com.kathir.demo.service;
 
 import com.kathir.demo.contracts.VotingContract;
 import com.kathir.demo.models.Candidate;
+import com.kathir.demo.models.Election;
 import com.kathir.demo.models.Voter;
 import com.kathir.demo.repository.CandidateRepository;
+import com.kathir.demo.repository.ElectionRepository;
 import com.kathir.demo.repository.VoterRepository;
 import com.kathir.demo.utils.JwtUtil;
 import com.kathir.demo.utils.OtpUtil;
 import jakarta.transaction.Transactional;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
@@ -33,6 +36,7 @@ public class VoterService {
     @Autowired
     private final VoterRepository voterRepository;
     private final CandidateRepository candidateRepository;
+    private final ElectionRepository electionRepository;
 
     private final OtpUtil otpUtil;
     private final JwtUtil jwtUtil;
@@ -135,7 +139,30 @@ public class VoterService {
 
     }
 
-    public List<CompletableFuture<BigInteger>> getVotesOfAllCandidatesAsync(String contractAddress){
+    public ResponseEntity<String> updateVoter(Map<String, String> body) {
+        long id = Long.parseLong(body.getOrDefault("id", "0"));
+        if (id == 0) return new ResponseEntity<>("provide id to update the details", HttpStatus.NOT_ACCEPTABLE);
+        Optional<Voter> voterOptional = voterRepository.findById(id);
+        if (voterOptional.isPresent()) {
+            Voter voter = voterOptional.get();
+            for (String key : body.keySet()) {
+                switch (key) {
+                    case "name" -> voter.setName((body.get(key)));
+                    case "email" -> voter.setEmail((body.get(key)));
+                    case "age" -> voter.setAge(Integer.parseInt(body.get(key)));
+                    case "voterAddress" -> voter.setVoterAddress(body.get(key));
+                    case "password" -> voter.setPassword(passwordEncoder.encode(body.get(key)));
+                }
+
+            }
+            voterRepository.save(voter);
+            return new ResponseEntity<>("Successfully updated the voter", HttpStatus.ACCEPTED);
+        }
+        return new ResponseEntity<>("no voter found for the provided id", HttpStatus.NOT_FOUND);
+
+    }
+
+    public List<Map<String, String>> getVotesOfAllCandidatesAsync(String contractAddress) {
         return votingService.getVotesOfAllCandidatesAsync(contractAddress);
     }
 
@@ -154,30 +181,44 @@ public class VoterService {
 
     /**
      * Vote for a candidate asynchronously
+     *
      * @param body Address of the voting contract
-     *  ID of the candidate to vote for
+     *             ID of the candidate to vote for
      * @return CompletableFuture with transaction hash
      */
-    public CompletableFuture<String> voteAsync(Map<String,String> body) throws Exception {
-        String contractAddress=body.get("contractAddress");
-        long candidateId=Long.parseLong(body.get("id"));
-        String voterAddress=body.get("voterAddress");
-       if(hasVoted(contractAddress,voterAddress)){
-           return CompletableFuture.supplyAsync(() -> {
-               try {
-                   return vote(contractAddress, candidateId);
-               } catch (Exception e) {
-                   throw new RuntimeException("Error casting vote: " + e.getMessage(), e);
-               }
-           });
-       }
-       return  CompletableFuture.failedFuture(new RuntimeException("Already voted"));
+    public ResponseEntity<CompletableFuture<String>> voteAsync(Map<String, String> body) throws Exception {
+        String contractAddress = body.get("contractAddress");
+        long candidateId = Long.parseLong(body.get("id"));
+        String voterAddress = body.get("voterAddress");
+
+        Optional<Voter> voterOptional = voterRepository.findByVoterAddress(voterAddress);
+        Voter voter = voterOptional.get();
+        Election election = electionRepository.findByContractAddress(contractAddress).get();
+
+        if (LocalDateTime.now().isAfter(election.getStartDate())
+                && LocalDateTime.now().isBefore(election.getEndDate())) {
+
+            if (hasVoted(contractAddress, voterAddress, voter)) {
+                return new ResponseEntity<>(CompletableFuture.supplyAsync(() -> {
+                    try {
+                        voter.setHasVoted(true);
+                        voterRepository.save(voter);
+                        return vote(contractAddress, candidateId);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error casting vote: " + e.getMessage(), e);
+                    }
+                }),HttpStatus.CREATED);
+            }
+            return new ResponseEntity<>(CompletableFuture.failedFuture(new RuntimeException("Already voted")),HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>(CompletableFuture.failedFuture(new RuntimeException("Currently there is no election scheduled")),HttpStatus.CONFLICT);
     }
 
     /**
      * Vote for a candidate
+     *
      * @param contractAddress Address of the voting contract
-     * @param candidateId ID of the candidate to vote for
+     * @param candidateId     ID of the candidate to vote for
      * @return Transaction hash
      * @throws Exception if voting fails
      */
@@ -188,18 +229,18 @@ public class VoterService {
     }
 
 
-
     /**
      * Check if an address has already voted
+     *
      * @param contractAddress Address of the voting contract
-     * @param voterAddress Address of the voter
+     * @param voterAddress    Address of the voter
      * @return True if voter has already voted, false otherwise
      * @throws Exception if checking vote status fails
      */
-    private boolean hasVoted(String contractAddress, String voterAddress) throws Exception {
+    private boolean hasVoted(String contractAddress, String voterAddress, Voter voter) throws Exception {
         VotingContract contract = votingService.load(contractAddress);
-        Optional<Voter> voterOptional=voterRepository.findByVoterAddress(voterAddress);
-        return contract.hasVoted(voterAddress).send()&&voterOptional.get().isHasVoted();
+
+        return !voter.isHasVoted() && !contract.hasVoted(voterAddress).send();
     }
 
 }

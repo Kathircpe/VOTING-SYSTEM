@@ -63,17 +63,21 @@ public class VotingService {
     }
 
 
-    public CompletableFuture<BigInteger> getVotesAsync(Map<String,String> body){
+    public Map<String,String> getVotesAsync(Map<String,String> body){
         String contractAddress=body.get("contractAddress");
-        long candidateId=Long.parseLong(body.get("candidateId"));
-        return getVotesAsync(contractAddress,candidateId);
+        int candidateId=Integer.parseInt(body.get("candidateId"));
+        String name=candidateRepository.findById(candidateId).get().getName();
+        CompletableFuture<BigInteger> future=getVotesAsync(contractAddress,candidateId);
+
+        return Map.of(name,future.join().toString());
     }
-    public List<CompletableFuture<BigInteger>> getVotesOfAllCandidatesAsync(String contractAddress ){
-        List<CompletableFuture<BigInteger>> list= new ArrayList<>();
+    public List<Map<String,String>> getVotesOfAllCandidatesAsync(String contractAddress ){
+        List<Map<String,String>> list= new ArrayList<>();
         List<Candidate> candidates=candidateRepository.findAll();
 
         for(Candidate candidate:candidates){
-            list.add(getVotesAsync(Map.of("contractAddress",contractAddress)));
+            int id=candidate.getId();
+            list.add(getVotesAsync(Map.of("contractAddress",contractAddress,"candidateId",""+id)));
         }
 
         return list;

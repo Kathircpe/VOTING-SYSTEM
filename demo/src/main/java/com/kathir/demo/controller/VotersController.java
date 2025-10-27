@@ -24,16 +24,22 @@ public  class VotersController {
     private String getVoterById(@PathVariable Long id){
         return voterService.getVoterById(id);
     }
+
     @GetMapping("/candidates")
     private List<Candidate> getAllCandidates(){
         return voterService.getAllCandidates();
     }
+
+    @PatchMapping("/updateVoter")
+    public ResponseEntity<String> updateVoter(@RequestBody Map<String, String> body){
+        return voterService.updateVoter(body);
+    }
     @PatchMapping("/vote")
-    private CompletableFuture<String> vote(@RequestBody Map<String,String> body) throws Exception {
+    private ResponseEntity<CompletableFuture<String>> vote(@RequestBody Map<String,String> body) throws Exception {
         return voterService.voteAsync(body);
     }
-    @GetMapping("/getVotes")
-    private List<CompletableFuture<BigInteger>> getVotesOfAllCandidatesAsync(@PathVariable String contractAddress){
+    @GetMapping("/getVotes/{contractAddress}")
+    private List<Map<String,String>> getVotesOfAllCandidatesAsync(@PathVariable String contractAddress){
         return voterService.getVotesOfAllCandidatesAsync(contractAddress);
     }
 

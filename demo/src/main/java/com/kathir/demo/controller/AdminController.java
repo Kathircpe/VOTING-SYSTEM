@@ -63,14 +63,19 @@ public  class AdminController {
             return adminService.getVoterById(id);
         }
 
-        @GetMapping("/getVotesForAll")
-        private List<CompletableFuture<BigInteger>> getVotesOfAllCandidatesAsync(@PathVariable String contractAddress){
+        @GetMapping("/getVotesForAll/{contractAddress}")
+        private List<Map<String,String>> getVotesOfAllCandidatesAsync(@PathVariable String contractAddress){
             return adminService.getVotesOfAllCandidatesAsync(contractAddress);
         }
 
         @GetMapping("/getVotes")
-        private CompletableFuture<BigInteger> getVotesAsync(@RequestBody Map<String,String> body){
+        private Map<String,String> getVotesAsync(@RequestBody Map<String,String> body){
             return adminService.getVotesAsync(body);
+        }
+
+        @PatchMapping("/updateAdmin")
+        private ResponseEntity<String> updateAdmin(@RequestBody Map<String,String> body){
+            return adminService.updateAdmin(body);
         }
 
 

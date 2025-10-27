@@ -101,12 +101,13 @@ public class AdminService {
     public ResponseEntity<String> createElection(Map<String, String> body) throws Exception {
 
         try{
-            LocalDateTime from=LocalDateTime.parse(body.get("from"));
-            LocalDateTime to=LocalDateTime.parse(body.get("to"));
             String name=body.get("electionName");
+            LocalDateTime startDate=LocalDateTime.parse(body.get("startDate"));
+            LocalDateTime endDate=LocalDateTime.parse(body.get("endDate"));
+
             Election election=new Election();
-            election.setEndDate(to);
-            election.setStartDate(from);
+            election.setEndDate(endDate);
+            election.setStartDate(startDate);
             election.setElectionName(name);
             election.setContractAddress(deploy());
             electionRepository.save(election);
@@ -218,13 +219,31 @@ public class AdminService {
         return contract.getContractAddress();
     }
 
-    public CompletableFuture<BigInteger> getVotesAsync( Map<String,String> body){
+    public Map<String,String> getVotesAsync( Map<String,String> body){
         return votingService.getVotesAsync(body);
     }
 
-    public List<CompletableFuture<BigInteger>> getVotesOfAllCandidatesAsync(String contractAddress){
+    public List<Map<String,String>> getVotesOfAllCandidatesAsync(String contractAddress){
         return votingService.getVotesOfAllCandidatesAsync(contractAddress);
     }
 
 
+    public ResponseEntity<String> updateAdmin(Map<String, String> body) {
+        long id=Long.parseLong(body.get("id"));
+        Optional<Admin> adminOptional=adminRepository.findById(id);
+        if(adminOptional.isPresent()) {
+            Admin admin=adminOptional.get();
+            for (String key : body.keySet()) {
+                switch (key) {
+                    case "name" -> admin.setName(body.get(key));
+                    case "email" -> admin.setEmail(body.get(key));
+                    case "phoneNumber" -> admin.setPhoneNumber(body.get(key));
+                    case "password" -> admin.setPassword(passwordEncoder.encode(body.get(key)));
+                }
+            }
+            adminRepository.save(admin);
+            return new ResponseEntity<>("Successfully updated admin credentials", HttpStatus.ACCEPTED);
+        }
+        return new ResponseEntity<>("admin not found", HttpStatus.NOT_FOUND);
+    }
 }
