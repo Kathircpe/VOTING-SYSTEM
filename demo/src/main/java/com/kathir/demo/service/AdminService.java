@@ -44,9 +44,6 @@ public class AdminService {
     private final ElectionRepository electionRepository;
     private final CandidateRepository candidateRepository;
 
-    private final OtpUtil otpUtil;
-    private final OtpService otpService;
-    private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final VotingService votingService;
 
@@ -54,148 +51,119 @@ public class AdminService {
     private final Credentials credentials;
     private final ContractGasProvider gasProvider;
 
-    public Page<Voter> getAllVoters(int page,int size){
-        Pageable pageable= PageRequest.of(page,size);
+    public Page<Voter> getAllVoters(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         return voterRepository.findAll(pageable);
     }
 
-    public Voter getVoterById(long id) {
-        return voterRepository.findById(id).orElseThrow(()-> new IllegalStateException(id+" not found"));
+    public ResponseEntity<?> getVoterById(long id) {
+        Optional<Voter> voterOptional = voterRepository.findById(id);
+        if (voterOptional.isPresent()) {
+            return new ResponseEntity<>(voterOptional.get(), HttpStatus.FOUND);
+        }
+        return new ResponseEntity<>(id + " not found", HttpStatus.NOT_FOUND);
     }
 
-    public ResponseEntity<?> adminLogin(Map<String, String> body) {
-        String email = body.get("email");
-        String password = body.get("password");
-        Optional<Admin> adminOptional = adminRepository.findByEmail(email);
-        if (adminOptional.isEmpty()) {
-            return new ResponseEntity<>("The provided user detail is not registered", HttpStatus.UNAUTHORIZED);
-        }
-        Admin admin = adminOptional.get();
-        if (!passwordEncoder.matches(password, admin.getPassword())) {
-            return new ResponseEntity<>("The wrong password", HttpStatus.UNAUTHORIZED);
-        }
-        else if(body.containsKey("otp")&&!body.get("otp").equals(admin.getOtp())){
-            return new ResponseEntity<>("The wrong otp", HttpStatus.UNAUTHORIZED);
-        }
-
-            String token = jwtUtil.generateToken(email);
-            return ResponseEntity.ok(Map.of("token", token));
-
-
-
-    }
-
-    public void otpSender(String email) {
-        Optional<Admin> adminOptional=adminRepository.findByEmail(email);
-        if(adminOptional.isPresent()) {
-            Admin admin =adminOptional.get();
-            String otp = otpUtil.generateOtp();
-            otpService.sendOtp(admin.getEmail(), otp);
-            admin.setOtp(otp);
-            admin.setExpiration(LocalDateTime.now().plusMinutes(15));
-            adminRepository.save(admin);
-        }
-
-    }
 
     public ResponseEntity<String> createElection(Map<String, String> body) throws Exception {
 
-        try{
-            String name=body.get("electionName");
-            LocalDateTime startDate=LocalDateTime.parse(body.get("startDate"));
-            LocalDateTime endDate=LocalDateTime.parse(body.get("endDate"));
+        try {
+            String name = body.get("electionName");
+            LocalDateTime startDate = LocalDateTime.parse(body.get("startDate"));
+            LocalDateTime endDate = LocalDateTime.parse(body.get("endDate"));
 
-            Election election=new Election();
+            Election election = new Election();
             election.setEndDate(endDate);
             election.setStartDate(startDate);
             election.setElectionName(name);
             election.setContractAddress(deploy());
             electionRepository.save(election);
             //marking hasVoted as false for all voters
-            List<Voter> voters=voterRepository.findAll();
-            for(Voter voter:voters){
+            List<Voter> voters = voterRepository.findAll();
+            for (Voter voter : voters) {
                 voter.setHasVoted(false);
                 voterRepository.save(voter);
             }
-            return new ResponseEntity<>("successfully created an election",HttpStatus.CREATED);
-        }catch(Exception e){
-            return new ResponseEntity<>("error can't create an election",HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("successfully created an election", HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("error can't create an election", HttpStatus.BAD_REQUEST);
         }
 
     }
 
-    public String deleteElection(int id) {
-        Optional<Election> electionOptional=electionRepository.findById(id);
-        if(electionOptional.isPresent()){
+    public ResponseEntity<String> deleteElection(int id) {
+        Optional<Election> electionOptional = electionRepository.findById(id);
+        if (electionOptional.isPresent()) {
             electionRepository.deleteById(id);
-            return "Successfully deleted the election";
+            return new ResponseEntity<>("Successfully deleted the election", HttpStatus.OK);
         }
-        return "No election found for the provided id";
+        return new ResponseEntity<>("No election found for the provided id", HttpStatus.NOT_FOUND);
     }
 
-    public String updateElection(Map<String, String> body) {
-        int id=Integer.parseInt(body.getOrDefault("id","0"));
-        if(id==0)return "provide id to update the details";
-        Optional<Election> electionOptional=electionRepository.findById(id);
-        if(electionOptional.isPresent()){
-            Election election=electionOptional.get();
-            for(String key:body.keySet()){
-                switch(key){
+    public ResponseEntity<String> updateElection(Map<String, String> body) {
+        int id = Integer.parseInt(body.getOrDefault("id", "0"));
+        if (id == 0) return new ResponseEntity<>("provide id to update the details", HttpStatus.CONFLICT);
+        Optional<Election> electionOptional = electionRepository.findById(id);
+        if (electionOptional.isPresent()) {
+            Election election = electionOptional.get();
+            for (String key : body.keySet()) {
+                switch (key) {
                     case "from" -> election.setStartDate(LocalDateTime.parse(body.get(key)));
-                    case "to" ->election.setEndDate(LocalDateTime.parse(body.get(key)));
-                    case "contractAddress" ->election.setContractAddress(body.get(key));
-                    case "electionName" ->election.setElectionName(body.get(key));
+                    case "to" -> election.setEndDate(LocalDateTime.parse(body.get(key)));
+                    case "contractAddress" -> election.setContractAddress(body.get(key));
+                    case "electionName" -> election.setElectionName(body.get(key));
                 }
 
             }
             electionRepository.save(election);
-            return "Successfully updated the election";
+            return new ResponseEntity<>("Successfully updated the election", HttpStatus.CREATED);
         }
-        return "no election found for the provided id";
+        return new ResponseEntity<>("no election found for the provided id", HttpStatus.NOT_FOUND);
     }
 
-    public String createCandidate(Map<String, String> body) {
-        String partyName=body.get("partyName");
-        String name=body.get("name");
-        String constituency=body.get("constituency");
-        Candidate candidate=new Candidate();
+    public ResponseEntity<String> createCandidate(Map<String, String> body) {
+        String partyName = body.get("partyName");
+        String name = body.get("name");
+        String constituency = body.get("constituency");
+        Candidate candidate = new Candidate();
         candidate.setName(name);
         candidate.setPartyName(partyName);
         candidate.setConstituency(constituency);
         candidateRepository.save(candidate);
-        return "Successfully added the candidate";
+        return new ResponseEntity<>("Successfully added the candidate", HttpStatus.CREATED);
     }
 
-    public String updateCandidate(Map<String, String> body) {
-        int id=Integer.parseInt(body.getOrDefault("id","0"));
-        if(id==0)return "provide id to update the details";
-        Optional<Candidate> candidateOptional=candidateRepository.findById(id);
-        if(candidateOptional.isPresent()){
-            Candidate candidate=candidateOptional.get();
-            for(String key:body.keySet()){
-                switch(key){
-                    case "name" ->candidate.setName(body.get(key));
-                    case "constituency" ->candidate.setConstituency(body.get(key));
-                    case "partyName" ->candidate.setPartyName(body.get(key));
+    public ResponseEntity<String> updateCandidate(Map<String, String> body) {
+        int id = Integer.parseInt(body.getOrDefault("id", "0"));
+        if (id == 0) return new ResponseEntity<>("provide id to update the details", HttpStatus.CONFLICT);
+        Optional<Candidate> candidateOptional = candidateRepository.findById(id);
+        if (candidateOptional.isPresent()) {
+            Candidate candidate = candidateOptional.get();
+            for (String key : body.keySet()) {
+                switch (key) {
+                    case "name" -> candidate.setName(body.get(key));
+                    case "constituency" -> candidate.setConstituency(body.get(key));
+                    case "partyName" -> candidate.setPartyName(body.get(key));
                 }
             }
             candidateRepository.save(candidate);
-            return "Successfully updated the candidate";
+            return new ResponseEntity<>("Successfully updated the candidate", HttpStatus.CREATED);
         }
-        return "no candidate found for the provided id";
+        return new ResponseEntity<>("no candidate found for the provided id", HttpStatus.NOT_FOUND);
     }
 
-    public String deleteCandidate(int id) {
-        Optional<Candidate> candidateOptional=candidateRepository.findById(id);
-        if(candidateOptional.isPresent()){
+    public ResponseEntity<String> deleteCandidate(int id) {
+        Optional<Candidate> candidateOptional = candidateRepository.findById(id);
+        if (candidateOptional.isPresent()) {
             candidateRepository.deleteById(id);
-            return "Successfully deleted the candidate";
+            return new ResponseEntity<>("Successfully deleted the candidate", HttpStatus.OK);
         }
-        return "No candidate found for the provided id";
+        return new ResponseEntity<>("No candidate found for the provided id", HttpStatus.NOT_FOUND);
     }
 
     /**
      * Deploy a new voting contract asynchronously
+     *
      * @return CompletableFuture with contract address
      */
     public CompletableFuture<String> deployAsync() {
@@ -211,32 +179,40 @@ public class AdminService {
 
     /**
      * Deploy a new voting contract
+     *
      * @return Contract address
      * @throws Exception if deployment fails
      */
-    public String deploy() throws Exception {
+    private String deploy() throws Exception {
         VotingContract contract = VotingContract.deploy(web3j, credentials, gasProvider).send();
         return contract.getContractAddress();
     }
 
-    public Map<String,String> getVotesAsync( Map<String,String> body){
+    public Map<String, String> getVotesAsync(Map<String, String> body) {
         return votingService.getVotesAsync(body);
     }
 
-    public List<Map<String,String>> getVotesOfAllCandidatesAsync(String contractAddress){
+    public List<Map<String, String>> getVotesOfAllCandidatesAsync(String contractAddress) {
         return votingService.getVotesOfAllCandidatesAsync(contractAddress);
     }
 
 
     public ResponseEntity<String> updateAdmin(Map<String, String> body) {
-        long id=Long.parseLong(body.get("id"));
-        Optional<Admin> adminOptional=adminRepository.findById(id);
-        if(adminOptional.isPresent()) {
-            Admin admin=adminOptional.get();
+        long id = Long.parseLong(body.get("id"));
+        Optional<Admin> adminOptional = adminRepository.findById(id);
+        if (adminOptional.isPresent()) {
+            Admin admin = adminOptional.get();
             for (String key : body.keySet()) {
                 switch (key) {
                     case "name" -> admin.setName(body.get(key));
-                    case "email" -> admin.setEmail(body.get(key));
+                    case "email" -> {
+                        String email = body.get(key);
+                        Optional<Admin> adminOptionalForNewEmail = adminRepository.findByEmail(email);
+                        if (adminOptionalForNewEmail.isPresent()) {
+                            return new ResponseEntity<>("Email already registered another account", HttpStatus.NOT_ACCEPTABLE);
+                        }
+                        admin.setEmail(email);
+                    }
                     case "phoneNumber" -> admin.setPhoneNumber(body.get(key));
                     case "password" -> admin.setPassword(passwordEncoder.encode(body.get(key)));
                 }
@@ -246,4 +222,6 @@ public class AdminService {
         }
         return new ResponseEntity<>("admin not found", HttpStatus.NOT_FOUND);
     }
+
+
 }

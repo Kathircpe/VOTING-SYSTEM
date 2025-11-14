@@ -1,6 +1,7 @@
 package com.kathir.demo.controller;
 
 import com.kathir.demo.service.AdminService;
+import com.kathir.demo.service.AuthService;
 import com.kathir.demo.service.VoterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,44 +15,39 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AdminService adminService;
-    private final VoterService voterService;
+    private final AuthService authService;
 
-
-    @PostMapping("/ad/login")
-    public ResponseEntity<?> adminLogin(@RequestBody Map<String, String> body) {
-      return adminService.adminLogin(body);
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
+        return authService.login(body);
     }
 
-    @PostMapping("/ad/{email}")
-    public void adminOtpSender(@PathVariable String email) {
-
-        adminService.otpSender(email);
+    @PostMapping("/forgotPassword")
+    public ResponseEntity<String> forgotPassword(@RequestBody Map<String, String> body) {
+        return authService.forgotPassword(body);
     }
 
+    @PostMapping("/registration")
+    public ResponseEntity<String> voterRegistration(@RequestBody Map<String, String> body) {
 
-
-    @PostMapping("/vo/registration")
-    public ResponseEntity<String> voterRegistration(@RequestBody Map<String,String> body) {
-
-        return voterService.voterRegistration(body);
+        return authService.voterRegistration(body);
     }
 
     @PostMapping("/vo/verification")
-    public ResponseEntity<String> voterVerification(@RequestBody Map<String,String> body) {
+    public ResponseEntity<String> voterVerification(@RequestBody Map<String, String> body) {
 
-       return voterService.voterVerification(body);
+        return authService.voterVerification(body);
     }
 
     @PostMapping("/vo/{email}")
-    public void voterOtpSender(@PathVariable String email){
+    public void otpSenderForVoter(@PathVariable String email) {
 
-         voterService.otpSender(email);
+        authService.otpSenderForVoter(email);
     }
 
-    @PostMapping("/vo/login")
-    public ResponseEntity<?> voterLogin(@RequestBody Map<String, String> body) {
-      return voterService.voterLogin(body);
+    @PostMapping("/ad/{email}")
+    public void otpSenderForAdmin(@PathVariable String email) {
+        authService.otpSenderForAdmin(email);
     }
 
 

@@ -15,30 +15,30 @@ import org.springframework.security.web.authentication.*;
 public class SecurityConfiguration {
 
     @Autowired
-    private  JwtFilter jwtFilter;
+    private JwtFilter jwtFilter;
 
     @Bean
-    public PasswordEncoder passwordEncoder()throws Exception {
+    public PasswordEncoder passwordEncoder() throws Exception {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests((auth) -> auth
-                        .anyRequest()
-                        .permitAll()
-                )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
 //        http
 //                .csrf(AbstractHttpConfigurer::disable)
 //                .authorizeHttpRequests((auth) -> auth
-//                        .requestMatchers("/auth/**").permitAll()
-//                        .anyRequest().authenticated()
+//                        .anyRequest()
+//                        .permitAll()
 //                )
 //                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 //        return http.build();
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers("/auth/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
     }
 }

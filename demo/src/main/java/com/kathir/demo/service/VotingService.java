@@ -27,6 +27,7 @@ public class VotingService {
 
     /**
      * Load an existing contract
+     *
      * @param address Contract address
      * @return SimpleVote contract instance
      */
@@ -36,8 +37,9 @@ public class VotingService {
 
     /**
      * Get vote count for a candidate asynchronously
+     *
      * @param contractAddress Address of the voting contract
-     * @param candidateId ID of the candidate
+     * @param candidateId     ID of the candidate
      * @return CompletableFuture with vote count
      */
     public CompletableFuture<BigInteger> getVotesAsync(String contractAddress, long candidateId) {
@@ -52,8 +54,9 @@ public class VotingService {
 
     /**
      * Get vote count for a candidate
+     *
      * @param contractAddress Address of the voting contract
-     * @param candidateId ID of the candidate
+     * @param candidateId     ID of the candidate
      * @return Vote count
      * @throws Exception if getting votes fails
      */
@@ -63,21 +66,22 @@ public class VotingService {
     }
 
 
-    public Map<String,String> getVotesAsync(Map<String,String> body){
-        String contractAddress=body.get("contractAddress");
-        int candidateId=Integer.parseInt(body.get("candidateId"));
-        String name=candidateRepository.findById(candidateId).get().getName();
-        CompletableFuture<BigInteger> future=getVotesAsync(contractAddress,candidateId);
+    public Map<String, String> getVotesAsync(Map<String, String> body) {
+        String contractAddress = body.get("contractAddress");
+        int candidateId = Integer.parseInt(body.get("candidateId"));
+        String name = candidateRepository.findById(candidateId).get().getName();
+        CompletableFuture<BigInteger> future = getVotesAsync(contractAddress, candidateId);
 
-        return Map.of(name,future.join().toString());
+        return Map.of(name, future.join().toString());
     }
-    public List<Map<String,String>> getVotesOfAllCandidatesAsync(String contractAddress ){
-        List<Map<String,String>> list= new ArrayList<>();
-        List<Candidate> candidates=candidateRepository.findAll();
 
-        for(Candidate candidate:candidates){
-            int id=candidate.getId();
-            list.add(getVotesAsync(Map.of("contractAddress",contractAddress,"candidateId",""+id)));
+    public List<Map<String, String>> getVotesOfAllCandidatesAsync(String contractAddress) {
+        List<Map<String, String>> list = new ArrayList<>();
+        List<Candidate> candidates = candidateRepository.findAll();
+
+        for (Candidate candidate : candidates) {
+            int id = candidate.getId();
+            list.add(getVotesAsync(Map.of("contractAddress", contractAddress, "candidateId", "" + id)));
         }
 
         return list;

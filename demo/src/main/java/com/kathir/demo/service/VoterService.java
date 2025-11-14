@@ -38,106 +38,24 @@ public class VoterService {
     private final CandidateRepository candidateRepository;
     private final ElectionRepository electionRepository;
 
-    private final OtpUtil otpUtil;
-    private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
-    private final OtpService otpService;
     private final VotingService votingService;
 
-    public String getVoterById(Long id) {
-        Voter voter = voterRepository.findById(id).orElseThrow(() -> new IllegalStateException(id + " not found"));
-        if (voter != null) {
-            return voter.getId() + "\n" + voter.getName();
+    public ResponseEntity<?> getVoterById(Long id) {
+        Optional<Voter> voterOptional = voterRepository.findById(id);
+
+        if (voterOptional.isPresent()) {
+            Voter voter = voterOptional.get();
+            return new ResponseEntity<>(Map.of("id", voter.getId(), "name", voter.getName()), HttpStatus.FOUND);
         }
-        return "ID not found";
+        return new ResponseEntity<>("ID not found", HttpStatus.NOT_FOUND);
     }
 
     public List<Candidate> getAllCandidates() {
         return candidateRepository.findAll();
     }
 
-    public ResponseEntity<String> voterRegistration(Map<String, String> body) {
-        String email = body.get("email");
-        Optional<Voter> VoterOptional = voterRepository.findByEmail(email);
-        if (VoterOptional.isPresent()) {
-            return new ResponseEntity<>("email has been already registered", HttpStatus.UNAUTHORIZED);
-        }
-        int age = Integer.parseInt(body.get("age"));
-        if (age < 18) return new ResponseEntity<>("Minors can't vote", HttpStatus.NOT_ACCEPTABLE);
-        String name = body.get("name");
-        String phoneNum = body.get("phoneNumber");
-        String voterAddress = body.get("voterAddress");
-        String password = body.get("password");
-
-        addNewVoter(email, name, phoneNum, voterAddress, password, age);
-
-        return new ResponseEntity<>("Successfully registered", HttpStatus.CREATED);
-
-    }
-
-    public ResponseEntity<String> voterVerification(Map<String, String> body) {
-
-        String email = body.get("email");
-        String otp = body.get("otp");
-
-        Optional<Voter> voterOptional = voterRepository.findByEmail(email);
-        if (voterOptional.isPresent()) {
-            Voter voter = voterOptional.get();
-            if (!otp.equals(voter.getOtp())) {
-                return new ResponseEntity<>("otp is not matching", HttpStatus.UNAUTHORIZED);
-            }
-            if (LocalDateTime.now().isAfter(voter.getExpiration())) {
-                return new ResponseEntity<>("otp expired", HttpStatus.NOT_ACCEPTABLE);
-            }
-            voter.setEnabled(true);
-            voterRepository.save(voter);
-            return new ResponseEntity<>("Successfully verified", HttpStatus.OK);
-
-        }
-        return new ResponseEntity<>("You need register first to verify", HttpStatus.UNAUTHORIZED);
-
-    }
-
-    public ResponseEntity<?> voterLogin(Map<String, String> body) {
-        String email = body.get("email");
-        String password = body.get("password");
-        Optional<Voter> voterOptional = voterRepository.findByEmail(email);
-        if (voterOptional.isEmpty()) {
-            return new ResponseEntity<>("The provided user detail is not registered", HttpStatus.UNAUTHORIZED);
-        }
-        Voter voter = voterOptional.get();
-
-        if (!voter.isEnabled()) {
-            return new ResponseEntity<>("Your account is not verified", HttpStatus.UNAUTHORIZED);
-        }
-
-        if (!passwordEncoder.matches(password, voter.getPassword())) {
-            return new ResponseEntity<>("Wrong password", HttpStatus.UNAUTHORIZED);
-        } else if (body.containsKey("otp") && !body.get("otp").equals(voter.getOtp())) {
-            return new ResponseEntity<>("The wrong otp", HttpStatus.UNAUTHORIZED);
-        }
-        String token = jwtUtil.generateToken(email);
-        return ResponseEntity.ok(Map.of("token", token));
-
-    }
-
-    public void addNewVoter(String email, String name, String phoneNum, String voterAddress, String password, int age) {
-        Voter voter = new Voter();
-        voter.setEmail(email);
-        voter.setName(name);
-        voter.setPhoneNumber(phoneNum);
-        voter.setVoterAddress(voterAddress);
-        voter.setAge(age);
-        voter.setPassword(passwordEncoder.encode(password));
-        String otp = otpUtil.generateOtp();
-        otpService.sendOtp(voter.getEmail(), otp);
-        voter.setOtp(otp);
-        voter.setExpiration(LocalDateTime.now().plusMinutes(15));
-        voterRepository.save(voter);
-
-
-    }
 
     public ResponseEntity<String> updateVoter(Map<String, String> body) {
         long id = Long.parseLong(body.getOrDefault("id", "0"));
@@ -148,10 +66,18 @@ public class VoterService {
             for (String key : body.keySet()) {
                 switch (key) {
                     case "name" -> voter.setName((body.get(key)));
-                    case "email" -> voter.setEmail((body.get(key)));
+                    case "email" -> {
+                        String email = body.get(key);
+                        Optional<Voter> voterOptionalForNewEmail = voterRepository.findByEmail(email);
+                        if (voterOptionalForNewEmail.isPresent()) {
+                            return new ResponseEntity<>("Email already registered another account", HttpStatus.NOT_ACCEPTABLE);
+                        }
+                        voter.setEmail(email);
+                    }
                     case "age" -> voter.setAge(Integer.parseInt(body.get(key)));
                     case "voterAddress" -> voter.setVoterAddress(body.get(key));
                     case "password" -> voter.setPassword(passwordEncoder.encode(body.get(key)));
+
                 }
 
             }
@@ -166,18 +92,6 @@ public class VoterService {
         return votingService.getVotesOfAllCandidatesAsync(contractAddress);
     }
 
-    public void otpSender(String email) {
-        Optional<Voter> voterOptional = voterRepository.findByEmail(email);
-        if (voterOptional.isPresent()) {
-            Voter voter = voterOptional.get();
-            String otp = otpUtil.generateOtp();
-            otpService.sendOtp(voter.getEmail(), otp);
-            voter.setOtp(otp);
-            voter.setExpiration(LocalDateTime.now().plusMinutes(15));
-            voterRepository.save(voter);
-        }
-
-    }
 
     /**
      * Vote for a candidate asynchronously
@@ -207,11 +121,11 @@ public class VoterService {
                     } catch (Exception e) {
                         throw new RuntimeException("Error casting vote: " + e.getMessage(), e);
                     }
-                }),HttpStatus.CREATED);
+                }), HttpStatus.CREATED);
             }
-            return new ResponseEntity<>(CompletableFuture.failedFuture(new RuntimeException("Already voted")),HttpStatus.CONFLICT);
+            return new ResponseEntity<>(CompletableFuture.failedFuture(new RuntimeException("Already voted")), HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>(CompletableFuture.failedFuture(new RuntimeException("Currently there is no election scheduled")),HttpStatus.CONFLICT);
+        return new ResponseEntity<>(CompletableFuture.failedFuture(new RuntimeException("Currently there is no election scheduled")), HttpStatus.CONFLICT);
     }
 
     /**
@@ -222,7 +136,7 @@ public class VoterService {
      * @return Transaction hash
      * @throws Exception if voting fails
      */
-    public String vote(String contractAddress, long candidateId) throws Exception {
+    private String vote(String contractAddress, long candidateId) throws Exception {
         VotingContract contract = votingService.load(contractAddress);
         TransactionReceipt receipt = contract.vote(BigInteger.valueOf(candidateId)).send();
         return receipt.getTransactionHash();

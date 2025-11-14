@@ -34,7 +34,7 @@ public class Admin {
     private String email;
     @NotNull
     @NotBlank
-    @Pattern(regexp="^[0-9]{10}$")
+    @Pattern(regexp = "^[0-9]{10}$")
     private String phoneNumber;
 
     private String password;

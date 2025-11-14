@@ -10,12 +10,12 @@ public class OtpService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void sendOtp(String toEmail,String otp){
+    public void sendOtp(String toEmail, String otp) {
 
-        SimpleMailMessage msg=new SimpleMailMessage();
+        SimpleMailMessage msg = new SimpleMailMessage();
         msg.setTo(toEmail);
         msg.setSubject("voter's portal registration");
-        msg.setText("Your Otp for voter's portal registration "+otp+". It expires in 15 minutes");
+        msg.setText("Your Otp for voter's portal registration " + otp + ". It expires in 15 minutes");
         mailSender.send(msg);
     }
 

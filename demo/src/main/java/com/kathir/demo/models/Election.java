@@ -21,10 +21,10 @@ public class Election {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  Integer Id;
+    private Integer Id;
     @NotNull
     @NotBlank
-    private  String electionName;
+    private String electionName;
 
     @DateTimeFormat
     private LocalDateTime startDate;
@@ -33,6 +33,6 @@ public class Election {
     private LocalDateTime endDate;
 
 
-    private  String contractAddress;
+    private String contractAddress;
 
 }

@@ -28,16 +28,16 @@ public class Voter {
 
     private Integer age;
 
-    private boolean hasVoted =false;
+    private boolean hasVoted;
 
-    private boolean isEnabled =false;
+    private boolean isEnabled;
     @NotNull
     @NotBlank
     @Email
     private String email;
     @NotNull
     @NotBlank
-    @Pattern(regexp="^[0-9]{10}$")
+    @Pattern(regexp = "^[0-9]{10}$")
     private String phoneNumber;
     @NotNull
     @NotBlank
