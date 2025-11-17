@@ -27,7 +27,7 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>25</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -50,6 +50,9 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<version>1.18.32</version>
+			<scope>provided</scope>
+
 		</dependency>
 
 		<dependency>
@@ -95,11 +98,8 @@
 		<dependency>
 			<groupId>org.web3j</groupId>
 			<artifactId>core</artifactId>
-			<version>4.14.0</version>
+			<version>4.10.0</version>
 		</dependency>
-
-
-
 
 	</dependencies>
 
@@ -113,15 +113,15 @@
 			<plugin>
 				<groupId>org.web3j</groupId>
 				<artifactId>web3j-maven-plugin</artifactId>
-				<version> 4.14.0</version>
+				<version> 4.9.4</version>
 
 				<configuration>
-					<packageName>contracts</packageName>
-					<sourceDestination>src/main/java/com/kathir/demo</sourceDestination>
+					<packageName>com.kathir.demo.contracts</packageName>
+					<sourceDestination>src/main/java/</sourceDestination>
 					<soliditySourceFiles>
 						<directory>src/main/java/com/kathir/demo</directory>
 						<includes>
-							<include>SimpleVote.sol</include>
+							<include>VotingContract.sol</include>
 						</includes>
 					</soliditySourceFiles>
 				</configuration>

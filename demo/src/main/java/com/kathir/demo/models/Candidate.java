@@ -6,11 +6,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Columns;
 
-
-@Data
 @Entity
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Candidate {

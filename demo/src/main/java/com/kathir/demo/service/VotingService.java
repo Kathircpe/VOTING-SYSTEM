@@ -3,11 +3,11 @@ package com.kathir.demo.service;
 import com.kathir.demo.contracts.VotingContract;
 import com.kathir.demo.models.Candidate;
 import com.kathir.demo.repository.CandidateRepository;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.gas.ContractGasProvider;
 
 import java.math.BigInteger;
@@ -18,7 +18,9 @@ import java.util.concurrent.CompletableFuture;
 
 @Service
 @Data
+@AllArgsConstructor
 public class VotingService {
+
 
     private final Web3j web3j;
     private final Credentials credentials;

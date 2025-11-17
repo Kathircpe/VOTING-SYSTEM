@@ -1,20 +1,18 @@
 package com.kathir.demo.controller;
 
-import com.kathir.demo.service.AdminService;
 import com.kathir.demo.service.AuthService;
-import com.kathir.demo.service.VoterService;
-import lombok.RequiredArgsConstructor;
+import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-
-
+@Data
 @RestController
-@RequestMapping("/auth")
-@RequiredArgsConstructor
+@RequestMapping("/api/v1/auth")
 public class AuthController {
 
+    @Autowired
     private final AuthService authService;
 
     @PostMapping("/login")

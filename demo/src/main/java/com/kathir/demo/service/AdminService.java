@@ -1,6 +1,5 @@
 package com.kathir.demo.service;
 
-
 import com.kathir.demo.contracts.VotingContract;
 import com.kathir.demo.models.Admin;
 import com.kathir.demo.models.Candidate;
@@ -8,8 +7,7 @@ import com.kathir.demo.models.Election;
 import com.kathir.demo.models.Voter;
 import com.kathir.demo.repository.CandidateRepository;
 import com.kathir.demo.repository.ElectionRepository;
-import com.kathir.demo.utils.JwtUtil;
-import com.kathir.demo.utils.OtpUtil;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,20 +19,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.kathir.demo.repository.AdminRepository;
 import com.kathir.demo.repository.VoterRepository;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.tx.gas.ContractGasProvider;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Data
+@AllArgsConstructor
 @Service
 public class AdminService {
 

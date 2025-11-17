@@ -2,24 +2,24 @@ package com.kathir.demo.controller;
 
 import com.kathir.demo.models.Voter;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import com.kathir.demo.service.AdminService;
 
-import java.math.BigInteger;
+import com.kathir.demo.service.AdminService;
+import org.springframework.web.bind.annotation.*;
+
+
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
+
 
 @Data
 @RestController
 @RequestMapping("/api/v1/admin")
-@Slf4j
 public class AdminController {
     private final static int PAGE_SIZE = 10;
+
     @Autowired
     private final AdminService adminService;
 

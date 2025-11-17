@@ -2,13 +2,11 @@ package com.kathir.demo.controller;
 
 import com.kathir.demo.models.Candidate;
 import com.kathir.demo.service.VoterService;
-import com.kathir.demo.service.VotingService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -20,7 +18,7 @@ public class VotersController {
     @Autowired
     private final VoterService voterService;
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     private ResponseEntity<?> getVoterById(@PathVariable Long id) {
         return voterService.getVoterById(id);
     }

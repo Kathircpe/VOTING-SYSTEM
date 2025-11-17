@@ -1,11 +1,13 @@
 package com.kathir.demo.service;
 
+import com.kathir.demo.DTO.*;
 import com.kathir.demo.models.Admin;
 import com.kathir.demo.models.Voter;
 import com.kathir.demo.repository.AdminRepository;
 import com.kathir.demo.repository.VoterRepository;
 import com.kathir.demo.utils.JwtUtil;
 import com.kathir.demo.utils.OtpUtil;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Data
+@AllArgsConstructor
 @Service
 public class AuthService {
 
@@ -35,8 +38,8 @@ public class AuthService {
         String email = body.get("email");
         String password = body.get("password");
         String role = body.get("role");
-        Map<String, String> map = new HashMap<>();
-        Optional<?> user = Optional.empty();
+        Map<String, Object> map = new HashMap<>();
+
         if (role.equals("admin")) {
             Optional<Admin> adminOptional = adminRepository.findByEmail(email);
             if (adminOptional.isEmpty()) {
@@ -47,11 +50,12 @@ public class AuthService {
             if (!passwordEncoder.matches(password, admin.getPassword())) {
                 return new ResponseEntity<>("The wrong password", HttpStatus.UNAUTHORIZED);
             }
-            map.put("id", "" + admin.getId());
-            map.put("name", admin.getName());
-            map.put("email", admin.getEmail());
-            map.put("phoneNumber", admin.getPhoneNumber());
-
+            userAdmin user = new userAdmin();
+            user.id = admin.getId();
+            user.name = admin.getName();
+            user.email = admin.getEmail();
+            user.phoneNumber = admin.getPhoneNumber();
+            map.put("user", user);
 
         } else if (role.equals("voter")) {
             Optional<Voter> voterOptional = voterRepository.findByEmail(email);
@@ -68,14 +72,17 @@ public class AuthService {
                 return new ResponseEntity<>("Wrong password", HttpStatus.UNAUTHORIZED);
             }
 
-            map.put("id", "" + voter.getId());
-            map.put("name", voter.getName());
-            map.put("email", voter.getEmail());
-            map.put("phoneNumber", voter.getPhoneNumber());
-            map.put("age", "" + voter.getAge());
-            map.put("hasVoted", "" + voter.isHasVoted());
-            map.put("isEnabled", "" + voter.isEnabled());
-            map.put("voterAddress", voter.getVoterAddress());
+            userVoter user = new userVoter();
+
+            user.id = voter.getId();
+            user.name = voter.getName();
+            user.email = voter.getEmail();
+            user.phoneNumber = voter.getPhoneNumber();
+            user.age = voter.getAge();
+            user.hasVoted = voter.isHasVoted();
+            user.isEnabled = voter.isEnabled();
+            user.voterAddress = voter.getVoterAddress();
+            map.put("user", user);
 
         } else {
             return new ResponseEntity<>("role is not defined", HttpStatus.UNAUTHORIZED);
