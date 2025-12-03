@@ -120,6 +120,7 @@
 					<sourceDestination>src/main/java/</sourceDestination>
 					<soliditySourceFiles>
 						<directory>src/main/java/com/kathir/demo</directory>
+                        <solcVersion>0.8.19</solcVersion>
 						<includes>
 							<include>VotingContract.sol</include>
 						</includes>
