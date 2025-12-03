@@ -68,18 +68,20 @@ public class AdminService {
             LocalDateTime startDate = LocalDateTime.parse(body.get("startDate"));
             LocalDateTime endDate = LocalDateTime.parse(body.get("endDate"));
 
+            Optional<Election> electionOptional = electionRepository.finActiveElection();
+            if (electionOptional.isPresent())
+                return new ResponseEntity<>("already there is an active election", HttpStatus.CONFLICT);
+
             Election election = new Election();
             election.setEndDate(endDate);
             election.setStartDate(startDate);
             election.setElectionName(name);
             election.setContractAddress(deploy());
             electionRepository.save(election);
+
             //marking hasVoted as false for all voters
-            List<Voter> voters = voterRepository.findAll();
-            for (Voter voter : voters) {
-                voter.setHasVoted(false);
-                voterRepository.save(voter);
-            }
+            voterRepository.updateAllHasVotedToFalse();
+
             return new ResponseEntity<>("successfully created an election", HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>("error can't create an election", HttpStatus.BAD_REQUEST);
