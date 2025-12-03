@@ -110,32 +110,32 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 
-			<plugin>
-				<groupId>org.web3j</groupId>
-				<artifactId>web3j-maven-plugin</artifactId>
-				<version> 4.9.4</version>
+<!--			<plugin>-->
+<!--				<groupId>org.web3j</groupId>-->
+<!--				<artifactId>web3j-maven-plugin</artifactId>-->
+<!--				<version> 4.9.4</version>-->
 
-				<configuration>
-					<packageName>com.kathir.demo.contracts</packageName>
-					<sourceDestination>src/main/java/</sourceDestination>
-					<soliditySourceFiles>
-						<directory>src/main/java/com/kathir/demo</directory>
-                        <solcVersion>0.8.19</solcVersion>
-						<includes>
-							<include>VotingContract.sol</include>
-						</includes>
-					</soliditySourceFiles>
-				</configuration>
-				<executions>
-					<execution>
-						<id>generate-sources</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>generate-sources</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+<!--				<configuration>-->
+<!--					<packageName>com.kathir.demo.contracts</packageName>-->
+<!--					<sourceDestination>src/main/java/</sourceDestination>-->
+<!--					<soliditySourceFiles>-->
+<!--						<directory>src/main/java/com/kathir/demo</directory>-->
+<!--                        <solcVersion>0.8.19</solcVersion>-->
+<!--						<includes>-->
+<!--							<include>VotingContract.txt</include>-->
+<!--						</includes>-->
+<!--					</soliditySourceFiles>-->
+<!--				</configuration>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<id>generate-sources</id>-->
+<!--						<phase>generate-sources</phase>-->
+<!--						<goals>-->
+<!--							<goal>generate-sources</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
 
 		</plugins>
 	</build>
