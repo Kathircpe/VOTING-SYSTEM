@@ -1,6 +1,7 @@
 package com.kathir.demo.controller;
 
 import com.kathir.demo.models.Candidate;
+import com.kathir.demo.models.Election;
 import com.kathir.demo.service.VoterService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,11 @@ import java.util.concurrent.CompletableFuture;
 public class VotersController {
     @Autowired
     private final VoterService voterService;
+
+    @GetMapping("/election")
+    private List<Election> getAllElection() {
+        return voterService.getAllElection();
+    }
 
     @GetMapping("/{id}")
     private ResponseEntity<?> getVoterById(@PathVariable Long id) {

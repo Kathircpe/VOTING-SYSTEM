@@ -46,6 +46,9 @@ public class VoterService {
         }
         return new ResponseEntity<>("ID not found", HttpStatus.NOT_FOUND);
     }
+    public List<Election> getAllElection() {
+        return electionRepository.findAll();
+    }
 
     public List<Candidate> getAllCandidates() {
         return candidateRepository.findAll();
