@@ -74,7 +74,6 @@ public class VoterService {
                     }
                     case "age" -> voter.setAge(Integer.parseInt(body.get(key)));
                     case "voterAddress" -> voter.setVoterAddress(body.get(key));
-                    case "password" -> voter.setPassword(passwordEncoder.encode(body.get(key)));
 
                 }
 

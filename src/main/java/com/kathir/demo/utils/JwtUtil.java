@@ -14,14 +14,14 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-
-    private final String SECRET="nihimearasemobonzakuratakaebebmekitensaankanotachzangageyoshibanankaizitsu" ;
+    @Value("${jwt.token.secret}")
+    private String SECRET;
 
     private final Key secretKey = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 
     public String generateToken(String email) {
 
-        long EXPIRATION = 1000 * 60 * 15;
+        long EXPIRATION = 1000 * 60 * 60;
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))

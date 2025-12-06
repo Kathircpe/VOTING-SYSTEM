@@ -6,8 +6,8 @@ target/
 #env
 
 .env
-.env.local
-.env.production
+.env.*
+*.env
 
 ### STS ###
 .apt_generated
