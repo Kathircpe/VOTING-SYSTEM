@@ -32,7 +32,8 @@ public class AuthService {
     private final OtpUtil otpUtil;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
-    private final OtpService otpService;
+    private final BrevoEmailService brevoEmailService;
+
 
     public ResponseEntity<?> login(Map<String, String> body) {
         String email = body.get("email");
@@ -100,7 +101,7 @@ public class AuthService {
         if (adminOptional.isPresent()) {
             Admin admin = adminOptional.get();
             String otp = otpUtil.generateOtp();
-            otpService.sendOtp(admin.getEmail(), otp);
+            brevoEmailService.sendOtpEmail(admin.getEmail(), otp).subscribe();
             admin.setOtp(otp);
             admin.setExpiration(LocalDateTime.now().plusMinutes(15));
             adminRepository.save(admin);
@@ -208,7 +209,7 @@ public class AuthService {
         voter.setAge(age);
         voter.setPassword(passwordEncoder.encode(password));
         String otp = otpUtil.generateOtp();
-        otpService.sendOtp(voter.getEmail(), otp);
+        brevoEmailService.sendOtpEmail(voter.getEmail(), otp).subscribe();
         voter.setOtp(otp);
         voter.setExpiration(LocalDateTime.now().plusMinutes(15));
         voterRepository.save(voter);
@@ -221,7 +222,7 @@ public class AuthService {
         if (voterOptional.isPresent()) {
             Voter voter = voterOptional.get();
             String otp = otpUtil.generateOtp();
-            otpService.sendOtp(voter.getEmail(), otp);
+            brevoEmailService.sendOtpEmail(voter.getEmail(), otp).subscribe();
             voter.setOtp(otp);
             voter.setExpiration(LocalDateTime.now().plusMinutes(15));
             voterRepository.save(voter);
