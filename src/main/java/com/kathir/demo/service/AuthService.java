@@ -32,7 +32,7 @@ public class AuthService {
     private final OtpUtil otpUtil;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
-    private final BrevoEmailService brevoEmailService;
+    private final EmailService emailService;
 
 
     public ResponseEntity<?> login(Map<String, String> body) {
@@ -96,16 +96,19 @@ public class AuthService {
 
     }
 
-    public void otpSenderForAdmin(String email) {
+    public ResponseEntity<String> otpSenderForAdmin(String email) {
         Optional<Admin> adminOptional = adminRepository.findByEmail(email);
         if (adminOptional.isPresent()) {
             Admin admin = adminOptional.get();
             String otp = otpUtil.generateOtp();
-            brevoEmailService.sendOtpEmail(admin.getEmail(), otp).subscribe();
+            emailService.sendOtpEmail(admin.getEmail(), otp);
             admin.setOtp(otp);
             admin.setExpiration(LocalDateTime.now().plusMinutes(15));
             adminRepository.save(admin);
+            return new ResponseEntity<>("otp has been sent", HttpStatus.OK);
+
         }
+        return new ResponseEntity<>("user did not exist", HttpStatus.UNAUTHORIZED);
 
     }
 
@@ -209,7 +212,7 @@ public class AuthService {
         voter.setAge(age);
         voter.setPassword(passwordEncoder.encode(password));
         String otp = otpUtil.generateOtp();
-        brevoEmailService.sendOtpEmail(voter.getEmail(), otp).subscribe();
+        emailService.sendOtpEmail(voter.getEmail(), otp);
         voter.setOtp(otp);
         voter.setExpiration(LocalDateTime.now().plusMinutes(15));
         voterRepository.save(voter);
@@ -217,18 +220,25 @@ public class AuthService {
 
     }
 
-    public void otpSenderForVoter(String email) {
+    public ResponseEntity<String> otpSenderForVoter(String email) {
         Optional<Voter> voterOptional = voterRepository.findByEmail(email);
         if (voterOptional.isPresent()) {
             Voter voter = voterOptional.get();
             String otp = otpUtil.generateOtp();
-            brevoEmailService.sendOtpEmail(voter.getEmail(), otp).subscribe();
+            emailService.sendOtpEmail(voter.getEmail(), otp);
             voter.setOtp(otp);
             voter.setExpiration(LocalDateTime.now().plusMinutes(15));
             voterRepository.save(voter);
+            return new ResponseEntity<>("otp has been sent", HttpStatus.OK);
         }
+        return new ResponseEntity<>("user did not exist", HttpStatus.UNAUTHORIZED);
 
     }
+
+    public void ping(){
+        adminRepository.ping();
+    }
+
 
 
 }

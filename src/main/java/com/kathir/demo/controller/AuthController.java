@@ -3,10 +3,12 @@ package com.kathir.demo.controller;
 import com.kathir.demo.service.AuthService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+
 @Data
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -38,15 +40,21 @@ public class AuthController {
     }
 
     @PostMapping("/vo/{email}")
-    public void otpSenderForVoter(@PathVariable String email) {
+    public ResponseEntity<String> otpSenderForVoter(@PathVariable String email) {
 
-        authService.otpSenderForVoter(email);
+        return authService.otpSenderForVoter(email);
     }
 
     @PostMapping("/ad/{email}")
-    public void otpSenderForAdmin(@PathVariable String email) {
-        authService.otpSenderForAdmin(email);
+    public ResponseEntity<String> otpSenderForAdmin(@PathVariable String email) {
+        return authService.otpSenderForAdmin(email);
     }
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping(){
+        authService.ping();
+        return new ResponseEntity<>("DB and backend is awake", HttpStatus.OK);
+    }
+    
 
 
 }
