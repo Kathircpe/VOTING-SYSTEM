@@ -45,4 +45,7 @@ public class Voter {
 
 
     private LocalDateTime expiration;
+
+    private LocalDateTime otpTimer;
+
 }

@@ -34,6 +34,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
+    private static final int EXPIRATION = 15;
+    private static final int OTP_TIMER = 120;
+
 
     public ResponseEntity<?> login(Map<String, String> body) {
         String email = body.get("email");
@@ -100,10 +103,14 @@ public class AuthService {
         Optional<Admin> adminOptional = adminRepository.findByEmail(email);
         if (adminOptional.isPresent()) {
             Admin admin = adminOptional.get();
+            if (LocalDateTime.now().isBefore(admin.getOtpTimer()) && admin.getOtpTimer() != null) {
+                return new ResponseEntity<>("Wait for " + (admin.getOtpTimer().getSecond() - LocalDateTime.now().getSecond()) + " seconds to resend otp", HttpStatus.NOT_ACCEPTABLE);
+            }
             String otp = otpUtil.generateOtp();
             emailService.sendOtpEmail(admin.getEmail(), otp);
             admin.setOtp(otp);
-            admin.setExpiration(LocalDateTime.now().plusMinutes(15));
+            admin.setExpiration(LocalDateTime.now().plusMinutes(EXPIRATION));
+            admin.setOtpTimer(LocalDateTime.now().plusSeconds(OTP_TIMER));
             adminRepository.save(admin);
             return new ResponseEntity<>("otp has been sent", HttpStatus.OK);
 
@@ -214,7 +221,8 @@ public class AuthService {
         String otp = otpUtil.generateOtp();
         emailService.sendOtpEmail(voter.getEmail(), otp);
         voter.setOtp(otp);
-        voter.setExpiration(LocalDateTime.now().plusMinutes(15));
+        voter.setExpiration(LocalDateTime.now().plusMinutes(EXPIRATION));
+        voter.setOtpTimer(LocalDateTime.now().plusSeconds(OTP_TIMER));
         voterRepository.save(voter);
 
 
@@ -224,10 +232,15 @@ public class AuthService {
         Optional<Voter> voterOptional = voterRepository.findByEmail(email);
         if (voterOptional.isPresent()) {
             Voter voter = voterOptional.get();
+            if (LocalDateTime.now().isBefore(voter.getOtpTimer()) && voter.getOtpTimer() != null) {
+                return new ResponseEntity<>("Wait for " + (voter.getOtpTimer().getSecond() - LocalDateTime.now().getSecond()) + " seconds to resend otp", HttpStatus.NOT_ACCEPTABLE);
+            }
+
             String otp = otpUtil.generateOtp();
             emailService.sendOtpEmail(voter.getEmail(), otp);
             voter.setOtp(otp);
-            voter.setExpiration(LocalDateTime.now().plusMinutes(15));
+            voter.setExpiration(LocalDateTime.now().plusMinutes(EXPIRATION));
+            voter.setOtpTimer(LocalDateTime.now().plusSeconds(OTP_TIMER));
             voterRepository.save(voter);
             return new ResponseEntity<>("otp has been sent", HttpStatus.OK);
         }
@@ -235,10 +248,9 @@ public class AuthService {
 
     }
 
-    public void ping(){
+    public void ping() {
         adminRepository.ping();
     }
-
 
 
 }
