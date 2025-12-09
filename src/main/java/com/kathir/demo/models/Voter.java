@@ -43,9 +43,7 @@ public class Voter {
 
     private String otp;
 
-
     private LocalDateTime expiration;
 
-    private LocalDateTime otpTimer;
 
 }

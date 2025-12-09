@@ -37,8 +37,6 @@ public class Admin {
 
     private LocalDateTime expiration;
 
-    private LocalDateTime otpTimer;
-
 
 }
 
