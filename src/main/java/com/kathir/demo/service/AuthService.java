@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +36,7 @@ public class AuthService {
     private final EmailService emailService;
 
     private static final int EXPIRATION = 15;
-    private static final int MINUTES_13_IN_SECONDS = 60 * 13;
+    private static final int MINUTES_13 = 13;
 
 
     public ResponseEntity<?> login(Map<String, String> body) {
@@ -104,10 +105,13 @@ public class AuthService {
         if (adminOptional.isPresent()) {
             Admin admin = adminOptional.get();
 
-            LocalDateTime otpTimer = admin.getExpiration().minusSeconds(MINUTES_13_IN_SECONDS);
+            LocalDateTime otpTimer = admin.getExpiration().minusMinutes(MINUTES_13);
+
             if (LocalDateTime.now().isBefore(otpTimer)) {
-                return new ResponseEntity<>("Wait for " + (otpTimer.getSecond() - LocalDateTime.now().getSecond()) + " seconds to resend otp", HttpStatus.NOT_ACCEPTABLE);
+                long waitingTime= Duration.between(LocalDateTime.now(),otpTimer).getSeconds();
+                return new ResponseEntity<>("Wait for " + waitingTime + " seconds to resend otp", HttpStatus.NOT_ACCEPTABLE);
             }
+
             String otp = otpUtil.generateOtp();
             emailService.sendOtpEmail(admin.getEmail(), otp);
             admin.setOtp(otp);
@@ -233,9 +237,11 @@ public class AuthService {
         if (voterOptional.isPresent()) {
             Voter voter = voterOptional.get();
 
-            LocalDateTime otpTimer = voter.getExpiration().minusSeconds(MINUTES_13_IN_SECONDS);
+            LocalDateTime otpTimer = voter.getExpiration().minusMinutes(MINUTES_13);
+
             if (LocalDateTime.now().isBefore(otpTimer)) {
-                return new ResponseEntity<>("Wait for " + (otpTimer.getSecond() - LocalDateTime.now().getSecond()) + " seconds to resend otp", HttpStatus.NOT_ACCEPTABLE);
+                long waitingTime= Duration.between(LocalDateTime.now(),otpTimer).getSeconds();
+                return new ResponseEntity<>("Wait for " + waitingTime + " seconds to resend otp", HttpStatus.NOT_ACCEPTABLE);
             }
 
             String otp = otpUtil.generateOtp();
