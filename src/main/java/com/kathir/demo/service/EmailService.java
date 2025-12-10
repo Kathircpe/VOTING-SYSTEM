@@ -1,43 +1,55 @@
 package com.kathir.demo.service;
 
-import com.mailersend.sdk.MailerSend;
-import com.mailersend.sdk.MailerSendResponse;
-import com.mailersend.sdk.emails.Email;
-import com.mailersend.sdk.exceptions.MailerSendException;
-
+import com.kathir.demo.configuration.EmailConfig;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Base64;
+
+import com.google.api.services.gmail.model.Message;
+import jakarta.mail.Session;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
+
+import java.io.ByteArrayOutputStream;
+import java.util.Properties;
 
 @Service
 @RequiredArgsConstructor
 public class EmailService {
 
+    private final EmailConfig emailConfig;
 
-    private final MailerSend mailerSend;
-
-    @Value("${resend.sender.email}")
-    private String senderEmail;
-    @Value("${resend.sender.name}")
-    private String senderName;
-
+    private static final String SUBJECT = "otp for Voting Portal";
 
     public void sendOtpEmail(String toEmail, String otp) {
 
-        Email email = new Email();
-        email.setFrom(senderName, senderEmail);
-        email.addRecipient("", toEmail);
-        email.setSubject("otp for Voting Portal");
-        email.setHtml("<p>Your otp for Voting portal <strong>" + otp + "</strong>. " +
-                "<br>It expires in 15 minutes and do not share it with anyone </p>");
+        final String body = "Your otp for Voting portal " + otp + ". It expires in 15 minutes and do not share it with anyone";
 
-        try {
-            MailerSendResponse res = mailerSend.emails().send(email);
-            System.out.println(res.messageId);
-        } catch (MailerSendException e) {
+        try{
+            MimeMessage email = new MimeMessage(Session.getDefaultInstance(new Properties()));
+            email.setFrom(new InternetAddress("me"));
+            email.addRecipient(jakarta.mail.Message.RecipientType.TO, new InternetAddress(toEmail));
+            email.setSubject(SUBJECT);
+            email.setText(body);
+
+            // Encode the email
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            email.writeTo(buffer);
+            String encodedEmail = Base64.getUrlEncoder().encodeToString(buffer.toByteArray());
+
+            // Create and send the message via Gmail API
+            Message message = new Message();
+            message.setRaw(encodedEmail);
+
+            emailConfig.getGmailService().users().messages().send("me", message).execute();
+            System.out.println("email has been sent to "+toEmail);
+        } catch(Exception e){
             e.printStackTrace();
         }
+
     }
+
 }
 
