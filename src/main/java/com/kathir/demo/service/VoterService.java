@@ -87,7 +87,7 @@ public class VoterService {
 
     public ResponseEntity<?> getVotesOfAllCandidatesAsync(int id) {
         Optional<Election> electionOptional=electionRepository.findById(id);
-        if(electionOptional.isEmpty())return new ResponseEntity<>("no election found for pthe provided id",HttpStatus.NOT_FOUND);
+        if(electionOptional.isEmpty())return new ResponseEntity<>("no election found for the provided id",HttpStatus.NOT_FOUND);
         Election election=electionOptional.get();
         String contractAddress=election.getContractAddress();
         return new ResponseEntity<>(votingService.getVotesOfAllCandidatesAsync(contractAddress),HttpStatus.FOUND);
@@ -123,8 +123,7 @@ public class VoterService {
             if (hasVoted(contractAddress, voterAddress, voter)) {
                 return new ResponseEntity<>(CompletableFuture.supplyAsync(() -> {
                     try {
-                        voter.setHasVoted(true);
-                        voterRepository.save(voter);
+                        voterRepository.updateHasVotedToTrue(voterId);
                         return vote(contractAddress, candidateId);
                     } catch (Exception e) {
                         throw new RuntimeException("Error casting vote: " + e.getMessage(), e);
