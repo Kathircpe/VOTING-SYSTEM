@@ -60,7 +60,6 @@ public class AdminService {
         return new ResponseEntity<>(id + " not found", HttpStatus.NOT_FOUND);
     }
 
-
     public ResponseEntity<String> createElection(Map<String, String> body) throws Exception {
 
         try {

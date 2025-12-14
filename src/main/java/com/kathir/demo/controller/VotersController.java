@@ -44,9 +44,9 @@ public class VotersController {
         return voterService.voteAsync(body);
     }
 
-    @GetMapping("/getVotes/{contractAddress}")
-    private List<Map<String, String>> getVotesOfAllCandidatesAsync(@PathVariable String contractAddress) {
-        return voterService.getVotesOfAllCandidatesAsync(contractAddress);
+    @GetMapping("/getVotes/{id}")
+    private ResponseEntity<?> getVotesOfAllCandidatesAsync(@PathVariable int id) {
+        return voterService.getVotesOfAllCandidatesAsync(id);
     }
 
 

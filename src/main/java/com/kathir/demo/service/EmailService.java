@@ -2,7 +2,6 @@ package com.kathir.demo.service;
 
 import com.kathir.demo.configuration.EmailConfig;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
@@ -25,7 +24,7 @@ public class EmailService {
 
     public void sendOtpEmail(String toEmail, String otp) {
 
-        final String body = "Your otp for Voting portal " + otp + ". It expires in 15 minutes and do not share it with anyone";
+        final String body = "Your otp for Voting portal " + otp + ". It expires in 15 minutes and\n do not share it with anyone";
 
         try{
             MimeMessage email = new MimeMessage(Session.getDefaultInstance(new Properties()));

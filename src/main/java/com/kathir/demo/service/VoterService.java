@@ -85,8 +85,12 @@ public class VoterService {
 
     }
 
-    public List<Map<String, String>> getVotesOfAllCandidatesAsync(String contractAddress) {
-        return votingService.getVotesOfAllCandidatesAsync(contractAddress);
+    public ResponseEntity<?> getVotesOfAllCandidatesAsync(int id) {
+        Optional<Election> electionOptional=electionRepository.findById(id);
+        if(electionOptional.isEmpty())return new ResponseEntity<>("no election found for pthe provided id",HttpStatus.NOT_FOUND);
+        Election election=electionOptional.get();
+        String contractAddress=election.getContractAddress();
+        return new ResponseEntity<>(votingService.getVotesOfAllCandidatesAsync(contractAddress),HttpStatus.FOUND);
     }
 
 
@@ -98,13 +102,20 @@ public class VoterService {
      * @return CompletableFuture with transaction hash
      */
     public ResponseEntity<CompletableFuture<String>> voteAsync(Map<String, String> body) throws Exception {
-        String contractAddress = body.get("contractAddress");
-        long candidateId = Long.parseLong(body.get("id"));
-        String voterAddress = body.get("voterAddress");
+        int id = Integer.parseInt(body.get("id"));
+        long candidateId = Long.parseLong(body.get("candidateId"));
+        long voterId=Long.parseLong(body.get("voterId"));
 
-        Optional<Voter> voterOptional = voterRepository.findByVoterAddress(voterAddress);
+        Optional<Voter> voterOptional = voterRepository.findById(voterId);
+        if(voterOptional.isEmpty())return new ResponseEntity<>(CompletableFuture.failedFuture(new RuntimeException("can't fetch your id, try after sometime")), HttpStatus.CONFLICT);
         Voter voter = voterOptional.get();
-        Election election = electionRepository.findByContractAddress(contractAddress).get();
+
+        Optional<Election> electionOptional = electionRepository.findById(id);
+        if(electionOptional.isEmpty())return new ResponseEntity<>(CompletableFuture.failedFuture(new RuntimeException("There is no election with the provided id")), HttpStatus.CONFLICT);
+        Election election=electionOptional.get();
+
+        String voterAddress=voter.getVoterAddress();
+        String contractAddress=election.getContractAddress();
 
         if (LocalDateTime.now().isAfter(election.getStartDate())
                 && LocalDateTime.now().isBefore(election.getEndDate())) {
