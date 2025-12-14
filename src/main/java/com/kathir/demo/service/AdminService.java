@@ -189,8 +189,12 @@ public class AdminService {
         return votingService.getVotesAsync(body);
     }
 
-    public List<Map<String, String>> getVotesOfAllCandidatesAsync(String contractAddress) {
-        return votingService.getVotesOfAllCandidatesAsync(contractAddress);
+    public ResponseEntity<?> getVotesOfAllCandidatesAsync(int id) {
+        Optional<Election> electionOptional=electionRepository.findById(id);
+        if(electionOptional.isEmpty())return new ResponseEntity<>("no election found for the provided id",HttpStatus.NOT_FOUND);
+        String contractAddress =electionOptional.get().getContractAddress();
+
+        return new ResponseEntity<>(votingService.getVotesOfAllCandidatesAsync(contractAddress),HttpStatus.FOUND);
     }
 
 

@@ -63,9 +63,9 @@ public class AdminController {
         return adminService.getVoterById(id);
     }
 
-    @GetMapping("/getVotesForAll/{contractAddress}")
-    private List<Map<String, String>> getVotesOfAllCandidatesAsync(@PathVariable String contractAddress) {
-        return adminService.getVotesOfAllCandidatesAsync(contractAddress);
+    @GetMapping("/getVotesForAll/{id}")
+    private ResponseEntity<?> getVotesOfAllCandidatesAsync(@PathVariable int id) {
+        return adminService.getVotesOfAllCandidatesAsync(id);
     }
 
     @GetMapping("/getVotes")
