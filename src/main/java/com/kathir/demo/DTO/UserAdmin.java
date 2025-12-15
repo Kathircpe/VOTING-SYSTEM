@@ -1,6 +1,6 @@
 package com.kathir.demo.DTO;
 
-public class userAdmin{
+public class UserAdmin {
     
     public Long id;
    

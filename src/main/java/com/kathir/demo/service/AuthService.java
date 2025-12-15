@@ -55,7 +55,7 @@ public class AuthService {
             if (!passwordEncoder.matches(password, admin.getPassword())) {
                 return new ResponseEntity<>("The wrong password", HttpStatus.UNAUTHORIZED);
             }
-            userAdmin user = new userAdmin();
+            UserAdmin user = new UserAdmin();
             user.id = admin.getId();
             user.name = admin.getName();
             user.email = admin.getEmail();
@@ -77,7 +77,7 @@ public class AuthService {
                 return new ResponseEntity<>("Wrong password", HttpStatus.UNAUTHORIZED);
             }
 
-            userVoter user = new userVoter();
+            UserVoter user = new UserVoter();
 
             user.id = voter.getId();
             user.name = voter.getName();

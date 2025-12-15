@@ -1,6 +1,6 @@
 package com.kathir.demo.controller;
 
-import com.kathir.demo.models.Voter;
+import com.kathir.demo.DTO.UserVoter;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,7 +10,7 @@ import com.kathir.demo.service.AdminService;
 import org.springframework.web.bind.annotation.*;
 
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -54,7 +54,7 @@ public class AdminController {
     }
 
     @GetMapping("/getVoters/{page}")
-    private Page<Voter> getVoters(@PathVariable int page) {
+    private Page<UserVoter> getVoters(@PathVariable int page) {
         return adminService.getAllVoters(page, PAGE_SIZE);
     }
 
@@ -69,7 +69,8 @@ public class AdminController {
     }
 
     @GetMapping("/getVotes")
-    private ResponseEntity<?> getVotesAsync(@RequestBody Map<String, String> body) {
+    private ResponseEntity<?> getVotesAsync(@RequestParam int id,@RequestParam int candidateId) {
+        Map<String,String> body=new HashMap<>(Map.of("id",""+id,"candidateId",""+candidateId));
         return adminService.getVotesAsync(body);
     }
 

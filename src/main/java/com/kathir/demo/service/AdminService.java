@@ -1,5 +1,6 @@
 package com.kathir.demo.service;
 
+import com.kathir.demo.DTO.UserVoter;
 import com.kathir.demo.contracts.VotingContract;
 import com.kathir.demo.models.Admin;
 import com.kathir.demo.models.Candidate;
@@ -24,7 +25,6 @@ import org.web3j.protocol.Web3j;
 import org.web3j.tx.gas.ContractGasProvider;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -47,15 +47,17 @@ public class AdminService {
     private final Credentials credentials;
     private final ContractGasProvider gasProvider;
 
-    public Page<Voter> getAllVoters(int page, int size) {
+    public Page<UserVoter> getAllVoters(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return voterRepository.findAll(pageable);
+        return voterRepository.findAll(pageable).map(UserVoter::new);
     }
 
     public ResponseEntity<?> getVoterById(long id) {
         Optional<Voter> voterOptional = voterRepository.findById(id);
         if (voterOptional.isPresent()) {
-            return new ResponseEntity<>(voterOptional.get(), HttpStatus.FOUND);
+            Voter voter = voterOptional.get();
+            UserVoter user = new UserVoter(voter);
+            return new ResponseEntity<>(user, HttpStatus.FOUND);
         }
         return new ResponseEntity<>(id + " not found", HttpStatus.NOT_FOUND);
     }
@@ -186,19 +188,21 @@ public class AdminService {
     }
 
     public ResponseEntity<?> getVotesAsync(Map<String, String> body) {
-       Optional<Election> electionOptional= electionRepository.findByContractAddress(body.get("id"));
-        if(electionOptional.isEmpty())return new ResponseEntity<>("no election found for the provided id",HttpStatus.NOT_FOUND);
-        String contractAddress=electionOptional.get().getContractAddress();
-        body.put("contractAddress",contractAddress);
-        return new ResponseEntity<>(votingService.getVotesAsync(body,false),HttpStatus.FOUND);
+        Optional<Election> electionOptional = electionRepository.findByContractAddress(body.get("id"));
+        if (electionOptional.isEmpty())
+            return new ResponseEntity<>("no election found for the provided id", HttpStatus.NOT_FOUND);
+        String contractAddress = electionOptional.get().getContractAddress();
+        body.put("contractAddress", contractAddress);
+        return new ResponseEntity<>(votingService.getVotesAsync(body, false), HttpStatus.FOUND);
     }
 
     public ResponseEntity<?> getVotesOfAllCandidatesAsync(int id) {
-        Optional<Election> electionOptional=electionRepository.findById(id);
-        if(electionOptional.isEmpty())return new ResponseEntity<>("no election found for the provided id",HttpStatus.NOT_FOUND);
-        String contractAddress =electionOptional.get().getContractAddress();
+        Optional<Election> electionOptional = electionRepository.findById(id);
+        if (electionOptional.isEmpty())
+            return new ResponseEntity<>("no election found for the provided id", HttpStatus.NOT_FOUND);
+        String contractAddress = electionOptional.get().getContractAddress();
 
-        return new ResponseEntity<>(votingService.getVotesOfAllCandidatesAsync(contractAddress),HttpStatus.FOUND);
+        return new ResponseEntity<>(votingService.getVotesOfAllCandidatesAsync(contractAddress), HttpStatus.FOUND);
     }
 
 
