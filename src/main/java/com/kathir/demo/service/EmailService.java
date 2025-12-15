@@ -46,7 +46,7 @@ public class EmailService {
             "            </td>" +
             "          </tr>" +
             "          <tr>" +
-            "            <td style='font-size:13px; color:#666666;'>This code is valid for a short time.</td>" +
+            "            <td style='font-size:13px; color:#666666;'>This code is valid for 15 minnutes only.</td>" +
             "          </tr>" +
             "        </table>" +
             "      </td>" +
