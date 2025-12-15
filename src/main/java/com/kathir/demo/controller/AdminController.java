@@ -69,7 +69,7 @@ public class AdminController {
     }
 
     @GetMapping("/getVotes")
-    private Map<String, String> getVotesAsync(@RequestBody Map<String, String> body) {
+    private ResponseEntity<?> getVotesAsync(@RequestBody Map<String, String> body) {
         return adminService.getVotesAsync(body);
     }
 

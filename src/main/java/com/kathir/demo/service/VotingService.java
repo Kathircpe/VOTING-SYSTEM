@@ -12,6 +12,7 @@ import org.web3j.tx.gas.ContractGasProvider;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -68,22 +69,33 @@ public class VotingService {
     }
 
 
-    public Map<String, String> getVotesAsync(Map<String, String> body) {
+    public Map<String, String> getVotesAsync(Map<String, String> body, boolean isAll) {
         String contractAddress = body.get("contractAddress");
         int candidateId = Integer.parseInt(body.get("candidateId"));
-        String name = candidateRepository.findById(candidateId).get().getName();
-        CompletableFuture<BigInteger> future = getVotesAsync(contractAddress, candidateId);
 
-        return Map.of(name, future.join().toString());
+        CompletableFuture<BigInteger> future = getVotesAsync(contractAddress, candidateId);
+        Map<String, String> map = new HashMap<>(Map.of("votes", future.join().toString()));
+        if (!isAll) {
+            Candidate c = candidateRepository.findById(candidateId).get();
+            map.put("id", "" + c.getId());
+            map.put("name", c.getName());
+            map.put("partyName", c.getPartyName());
+        }
+
+        return map;
     }
 
     public List<Map<String, String>> getVotesOfAllCandidatesAsync(String contractAddress) {
         List<Map<String, String>> list = new ArrayList<>();
         List<Candidate> candidates = candidateRepository.findAll();
 
-        for (Candidate candidate : candidates) {
-            int id = candidate.getId();
-            list.add(getVotesAsync(Map.of("contractAddress", contractAddress, "candidateId", "" + id)));
+        for (Candidate c : candidates) {
+            int id = c.getId();
+            Map<String, String> map = getVotesAsync(Map.of("contractAddress", contractAddress, "candidateId", "" + id), true);
+            map.put("id", "" + c.getId());
+            map.put("name", c.getName());
+            map.put("partyName", c.getPartyName());
+            list.add(map);
         }
 
         return list;

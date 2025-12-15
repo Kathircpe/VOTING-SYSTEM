@@ -185,8 +185,12 @@ public class AdminService {
         return contract.getContractAddress();
     }
 
-    public Map<String, String> getVotesAsync(Map<String, String> body) {
-        return votingService.getVotesAsync(body);
+    public ResponseEntity<?> getVotesAsync(Map<String, String> body) {
+       Optional<Election> electionOptional= electionRepository.findByContractAddress(body.get("id"));
+        if(electionOptional.isEmpty())return new ResponseEntity<>("no election found for the provided id",HttpStatus.NOT_FOUND);
+        String contractAddress=electionOptional.get().getContractAddress();
+        body.put("contractAddress",contractAddress);
+        return new ResponseEntity<>(votingService.getVotesAsync(body,false),HttpStatus.FOUND);
     }
 
     public ResponseEntity<?> getVotesOfAllCandidatesAsync(int id) {
