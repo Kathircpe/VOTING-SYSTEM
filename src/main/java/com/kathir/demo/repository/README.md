@@ -11,12 +11,14 @@ The repository layer provides data access objects (DAOs) for interacting with th
 Provides data access for Voter entities.
 
 #### Standard CRUD Operations
+
 - `save(Voter voter)`: Save or update a voter
 - `findById(Long id)`: Find a voter by ID
 - `findAll()`: Retrieve all voters
 - `deleteById(Long id)`: Delete a voter by ID
 
 #### Custom Queries
+
 - `findByEmail(String email)`: Find a voter by email address
 - `findByVoterAddress(String voterAddress)`: Find a voter by Ethereum wallet address
 
@@ -25,6 +27,7 @@ Provides data access for Voter entities.
 Provides data access for Candidate entities.
 
 #### Standard CRUD Operations
+
 - `save(Candidate candidate)`: Save or update a candidate
 - `findById(Integer id)`: Find a candidate by ID
 - `findAll()`: Retrieve all candidates
@@ -35,12 +38,14 @@ Provides data access for Candidate entities.
 Provides data access for Election entities.
 
 #### Standard CRUD Operations
+
 - `save(Election election)`: Save or update an election
 - `findById(Integer id)`: Find an election by ID
 - `findAll()`: Retrieve all elections
 - `deleteById(Integer id)`: Delete an election by ID
 
 #### Custom Queries
+
 - `findByContractAddress(String contractAddress)`: Find an election by blockchain contract address
 
 ### AdminRepository
@@ -48,12 +53,14 @@ Provides data access for Election entities.
 Provides data access for Admin entities.
 
 #### Standard CRUD Operations
+
 - `save(Admin admin)`: Save or update an admin
 - `findById(Long id)`: Find an admin by ID
 - `findAll()`: Retrieve all admins
 - `deleteById(Long id)`: Delete an admin by ID
 
 #### Custom Queries
+
 - `findByEmail(String email)`: Find an admin by email address
 
 ## Pagination Support
@@ -91,3 +98,5 @@ Spring Data JPA automatically implements query methods based on method names:
 1. **Data Access Control**: Repositories are only accessed through service layers, not directly from controllers
 2. **Parameterized Queries**: All queries use parameterized statements to prevent SQL injection
 3. **Entity Validation**: Entities are validated before saving to ensure data integrity
+
+Last updated: 12/16/2025

@@ -4,6 +4,18 @@
 
 The configuration layer contains classes that configure various components of the blockchain-based voting application. These configurations are loaded at application startup and provide the necessary beans for the application to function.
 
+## Architecture
+
+The application follows a layered architecture:
+
+1. **Frontend**: Deployed separately, interacts with the REST API
+2. **REST API Layer**: Spring Boot controllers handle HTTP requests
+3. **Service Layer**: Business logic implementation
+4. **Data Access Layer**: JPA repositories for database operations
+5. **Blockchain Layer**: Ethereum smart contracts via Web3j
+6. **Database**: PostgreSQL for user and election data
+7. **Authentication**: JWT tokens with OTP verification
+
 ## Configuration Classes
 
 ### Web3jConfiguration
@@ -54,22 +66,26 @@ This configuration class sets up Swagger/OpenAPI documentation for the REST API.
 The main configuration file `application.properties` contains:
 
 ### Database Configuration
+
 - `spring.datasource.url`: PostgreSQL database connection URL
 - `spring.datasource.username`: Database username
 - `spring.datasource.password`: Database password (loaded from environment variable)
 - `spring.datasource.driver-class-name`: PostgreSQL driver class
 
 ### JPA/Hibernate Configuration
+
 - `spring.jpa.hibernate.ddl-auto`: Database schema generation strategy (update)
 - `spring.properties.hibernate.dialect`: PostgreSQL dialect
 - `spring.properties.hibernate.format_sql`: SQL formatting
 - `spring.jpa.show-sql`: SQL query logging
 
 ### Web3j Configuration
+
 - `web3.rpc-url`: Ethereum node RPC URL
 - `web3.private-key`: Ethereum account private key (loaded from environment variable)
 
 ### Email Configuration
+
 - `spring.mail.host`: SMTP server host (Gmail)
 - `spring.mail.port`: SMTP server port
 - `spring.mail.properties.mail.smtp.auth`: SMTP authentication enabled
@@ -112,3 +128,7 @@ The application is configured to connect to the Sepolia test network through Inf
 - Uses HTTPS RPC endpoint
 - Requires a valid Infura project ID
 - Can be changed to connect to other Ethereum networks or nodes
+
+## Update History
+
+- Updated README.md file to include more details about the configuration classes and properties used.

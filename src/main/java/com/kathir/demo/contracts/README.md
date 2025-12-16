@@ -7,6 +7,7 @@ This is the core Ethereum smart contract that handles the voting functionality f
 ### Contract Overview
 
 The `SimpleVote` contract is a simple implementation of a voting system that:
+
 1. Tracks votes for different candidates
 2. Prevents double voting by recording which addresses have already voted
 3. Provides transparency through event logging
@@ -14,24 +15,31 @@ The `SimpleVote` contract is a simple implementation of a voting system that:
 ### Data Structures
 
 #### voteCount
+
 ```solidity
 mapping(uint256 => uint256) public voteCount;
 ```
+
 This mapping tracks the number of votes each candidate has received. The key is the candidate ID, and the value is the vote count.
 
 #### hasVoted
+
 ```solidity
 mapping(address => bool) public hasVoted;
 ```
+
 This mapping tracks which Ethereum addresses have already voted. It prevents double voting by recording the voting status of each address.
 
 ### Events
 
 #### Voted
+
 ```solidity
 event Voted(address indexed voter, uint256 indexed candidateId, uint256 newCount);
 ```
+
 This event is emitted whenever a vote is cast. It logs:
+
 - The voter's address
 - The candidate ID they voted for
 - The new vote count for that candidate
@@ -41,37 +49,47 @@ Events are stored on the blockchain and provide a transparent record of all voti
 ### Functions
 
 #### vote
+
 ```solidity
 function vote(uint256 candidateId) external
 ```
+
 This function allows an Ethereum address to cast a vote for a candidate.
 
 **Parameters:**
+
 - `candidateId`: The ID of the candidate to vote for
 
 **Functionality:**
+
 1. Checks if the caller has already voted using the `hasVoted` mapping
 2. If not, marks the caller's address as having voted
 3. Increments the vote count for the specified candidate
 4. Emits a `Voted` event with the details of the vote
 
 **Security Features:**
+
 - Uses `require(!hasVoted[msg.sender], "Already voted")` to prevent double voting
 - Only allows external accounts to vote (not other contracts)
 
 #### getVotes
+
 ```solidity
 function getVotes(uint256 candidateId) external view returns (uint256)
 ```
+
 This function returns the current vote count for a specific candidate.
 
 **Parameters:**
+
 - `candidateId`: The ID of the candidate to query
 
 **Returns:**
+
 - The number of votes the candidate has received
 
 **Functionality:**
+
 - Provides a read-only view function to query vote counts
 - Can be called by anyone without spending gas (when called off-chain)
 
@@ -96,6 +114,7 @@ This function returns the current vote count for a specific candidate.
 ### Deployment
 
 The contract is deployed using the Web3j library from the Java application. The deployment process:
+
 1. Compiles the Solidity contract to bytecode
 2. Sends a transaction to deploy the contract to the Ethereum network
 3. Returns the contract address for future interactions
@@ -103,7 +122,24 @@ The contract is deployed using the Web3j library from the Java application. The 
 ### Interaction with Java Application
 
 The Java application uses Web3j to:
+
 1. Deploy new instances of the contract for each election
 2. Load existing contracts using their addresses
 3. Call contract functions like `vote()` and `getVotes()`
 4. Listen for `Voted` events to track voting activity
+
+## Architecture
+
+The application follows a layered architecture:
+
+1. **Frontend**: Deployed separately, interacts with the REST API
+2. **REST API Layer**: Spring Boot controllers handle HTTP requests
+3. **Service Layer**: Business logic implementation
+4. **Data Access Layer**: JPA repositories for database operations
+5. **Blockchain Layer**: Ethereum smart contracts via Web3j
+6. **Database**: PostgreSQL for user and election data
+7. **Authentication**: JWT tokens with OTP verification
+
+## Update History
+
+- Updated README.md file to include more details about the contract and its functions.

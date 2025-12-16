@@ -86,6 +86,7 @@ Represents an administrator of the system.
 ## Relationships
 
 There are no explicit JPA relationships defined between entities in this application. Instead, relationships are managed through:
+
 1. The `contractAddress` field in Election linking to the blockchain contract
 2. The `voterAddress` field in Voter linking to the Ethereum wallet address
 3. Business logic in services that coordinate between entities
@@ -93,6 +94,7 @@ There are no explicit JPA relationships defined between entities in this applica
 ## Lombok Annotations
 
 All entities use Lombok annotations to reduce boilerplate code:
+
 - `@Data`: Generates getters, setters, toString, equals, and hashCode methods
 - `@Entity`: Marks class as a JPA entity
 - `@AllArgsConstructor`: Generates constructor with all fields
@@ -101,6 +103,7 @@ All entities use Lombok annotations to reduce boilerplate code:
 ## Database Mapping
 
 Entities are mapped to PostgreSQL database tables using JPA annotations:
+
 - `@Entity`: Maps class to database table
 - `@Id`: Marks primary key field
 - `@GeneratedValue`: Specifies primary key generation strategy
@@ -109,6 +112,7 @@ Entities are mapped to PostgreSQL database tables using JPA annotations:
 ## Validation Constraints
 
 Entities use Jakarta Bean Validation annotations for data validation:
+
 - `@NotNull`: Field cannot be null
 - `@NotBlank`: String field cannot be blank
 - `@Email`: String field must be valid email format
@@ -121,3 +125,5 @@ Entities use Jakarta Bean Validation annotations for data validation:
 2. **Unique Constraints**: Email addresses and Ethereum wallet addresses are unique
 3. **Required Fields**: Critical fields are marked as required to ensure data integrity
 4. **OTP Expiration**: OTPs have expiration times to limit their validity period
+
+Last updated: 12/16/2025

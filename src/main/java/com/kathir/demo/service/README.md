@@ -101,3 +101,5 @@ The services use Web3j to interact with the Ethereum blockchain:
 3. **JWT Tokens**: Secure authentication for API requests
 4. **Blockchain Verification**: Vote integrity is ensured through blockchain immutability
 5. **Election Validation**: Votes can only be cast during active election periods
+
+Last updated: 12/16/2025

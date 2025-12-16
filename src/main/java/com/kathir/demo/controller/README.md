@@ -59,6 +59,7 @@ This controller provides administrative endpoints for managing elections and can
 ## Authentication
 
 All endpoints (except authentication endpoints) require JWT tokens for access:
+
 - Voters use tokens generated from `/auth/vo/login`
 - Admins use tokens generated from `/auth/ad/login`
 
@@ -67,6 +68,7 @@ Tokens should be included in the Authorization header as "Bearer {token}".
 ## Error Handling
 
 Controllers return appropriate HTTP status codes for different scenarios:
+
 - `200 OK`: Successful requests
 - `201 CREATED`: Successfully created resources
 - `400 BAD REQUEST`: Invalid request data
@@ -78,7 +80,12 @@ Controllers return appropriate HTTP status codes for different scenarios:
 ## Asynchronous Operations
 
 Some operations are performed asynchronously to prevent blocking:
+
 - Voting operations return `CompletableFuture` responses
 - Contract deployment operations return `CompletableFuture` responses
 
 Clients should handle these asynchronous responses appropriately.
+
+## Update History
+
+- Updated README.md file to include more details about the controllers and their endpoints.

@@ -8,7 +8,7 @@ This is a secure, transparent voting application built on blockchain technology.
 
 The application follows a layered architecture:
 
-1. **Frontend**: (Not included in current codebase) - Would interact with the REST API
+1. **Frontend**: Deployed separately, interacts with the REST API
 2. **REST API Layer**: Spring Boot controllers handle HTTP requests
 3. **Service Layer**: Business logic implementation
 4. **Data Access Layer**: JPA repositories for database operations
@@ -48,6 +48,7 @@ The application follows a layered architecture:
 ### Authentication
 
 #### Voter Registration
+
 ```
 POST /auth/vo/registration
 Body: {
@@ -61,6 +62,7 @@ Body: {
 ```
 
 #### Voter Verification
+
 ```
 POST /auth/vo/verification
 Body: {
@@ -70,6 +72,7 @@ Body: {
 ```
 
 #### Voter Login
+
 ```
 POST /auth/vo/login
 Body: {
@@ -80,6 +83,7 @@ Body: {
 ```
 
 #### Admin Login
+
 ```
 POST /auth/ad/login
 Body: {
@@ -92,16 +96,19 @@ Body: {
 ### Voter Operations
 
 #### Get Voter by ID
+
 ```
 GET /api/v1/voter/{id}
 ```
 
 #### Get All Candidates
+
 ```
 GET /api/v1/voter/candidates
 ```
 
 #### Update Voter Information
+
 ```
 PATCH /api/v1/voter/updateVoter
 Body: {
@@ -116,6 +123,7 @@ Body: {
 ```
 
 #### Cast Vote
+
 ```
 PATCH /api/v1/voter/vote
 Body: {
@@ -126,6 +134,7 @@ Body: {
 ```
 
 #### Get Vote Counts for All Candidates
+
 ```
 GET /api/v1/voter/getVotes/{contractAddress}
 ```
@@ -133,6 +142,7 @@ GET /api/v1/voter/getVotes/{contractAddress}
 ### Admin Operations
 
 #### Create Election
+
 ```
 POST /api/v1/admin/createElection
 Body: {
@@ -143,6 +153,7 @@ Body: {
 ```
 
 #### Update Election
+
 ```
 PATCH /api/v1/admin/updateElection
 Body: {
@@ -155,11 +166,13 @@ Body: {
 ```
 
 #### Delete Election
+
 ```
 DELETE /api/v1/admin/deleteElection/{id}
 ```
 
 #### Create Candidate
+
 ```
 POST /api/v1/admin/createCandidate
 Body: {
@@ -170,6 +183,7 @@ Body: {
 ```
 
 #### Update Candidate
+
 ```
 PATCH /api/v1/admin/updateCandidate
 Body: {
@@ -181,26 +195,31 @@ Body: {
 ```
 
 #### Delete Candidate
+
 ```
 DELETE /api/v1/admin/deleteCandidate/{id}
 ```
 
 #### Get All Voters (Paginated)
+
 ```
 GET /api/v1/admin/getVoters/{page}
 ```
 
 #### Get Voter by ID
+
 ```
 GET /api/v1/admin/getVoter/{id}
 ```
 
 #### Get Vote Counts for All Candidates
+
 ```
 GET /api/v1/admin/getVotesForAll/{contractAddress}
 ```
 
 #### Get Vote Count for Specific Candidate
+
 ```
 GET /api/v1/admin/getVotes
 Body: {
@@ -210,6 +229,7 @@ Body: {
 ```
 
 #### Update Admin Information
+
 ```
 PATCH /api/v1/admin/updateAdmin
 Body: {
@@ -243,6 +263,7 @@ The application uses the Web3j library to interact with Ethereum smart contracts
 The application uses PostgreSQL to store user and election data:
 
 ### Voter Table
+
 - id (Primary Key)
 - name
 - age
@@ -256,12 +277,14 @@ The application uses PostgreSQL to store user and election data:
 - expiration
 
 ### Candidate Table
+
 - id (Primary Key)
 - name
 - partyName
 - constituency
 
 ### Election Table
+
 - id (Primary Key)
 - electionName
 - startDate
@@ -269,6 +292,7 @@ The application uses PostgreSQL to store user and election data:
 - contractAddress (unique)
 
 ### Admin Table
+
 - id (Primary Key)
 - name
 - email (unique)
@@ -280,19 +304,23 @@ The application uses PostgreSQL to store user and election data:
 ## Authentication and Security
 
 ### JWT Tokens
+
 - Both voters and admins receive JWT tokens upon successful login
 - Tokens are used to authenticate subsequent requests
 
 ### OTP Verification
+
 - Two-factor authentication using email-based OTPs
 - OTPs expire after 15 minutes
 - OTPs are regenerated when needed
 
 ### Password Security
+
 - Passwords are hashed using Spring Security's password encoder
 - Secure storage in database
 
 ### Voting Security
+
 - Voters must be registered and verified
 - Voters can only vote once per election
 - Blockchain ensures vote integrity and prevents tampering

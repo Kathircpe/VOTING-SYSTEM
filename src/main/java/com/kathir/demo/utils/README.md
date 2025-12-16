@@ -54,5 +54,7 @@ This utility class handles OTP (One-Time Password) generation.
 
 1. **Secure OTP Generation**: Uses Java's SecureRandom for cryptographically secure OTPs
 2. **JWT Signing**: Tokens are signed with a secret key to prevent tampering
-3. **Token Expiration**: Tokens automatically expire after 24 hours
+3. **Token Expiration**: Tokens automatically expire after 15 minutes
 4. **Email Validation**: OTPs are sent to verified email addresses only
+
+Last updated: 12/16/2025
