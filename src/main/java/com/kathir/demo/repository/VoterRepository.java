@@ -20,8 +20,5 @@ public interface VoterRepository extends JpaRepository<Voter, Long> {
     @Query(value = "UPDATE voter SET has_voted = FALSE", nativeQuery = true)
     void updateAllHasVotedToFalse();
 
-    @Modifying
-    @Transactional
-    @Query(value = "UPDATE voter SET has_voted = TRUE WHERE u.id = :id ", nativeQuery = true)
-    void updateHasVotedToTrue(@Param("id") long id);
+
 }

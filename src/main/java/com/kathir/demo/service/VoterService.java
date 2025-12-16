@@ -46,6 +46,7 @@ public class VoterService {
         }
         return new ResponseEntity<>("ID not found", HttpStatus.NOT_FOUND);
     }
+
     public List<Election> getAllElection() {
         return electionRepository.findAll();
     }
@@ -86,11 +87,12 @@ public class VoterService {
     }
 
     public ResponseEntity<?> getVotesOfAllCandidatesAsync(int id) {
-        Optional<Election> electionOptional=electionRepository.findById(id);
-        if(electionOptional.isEmpty())return new ResponseEntity<>("no election found for the provided id",HttpStatus.NOT_FOUND);
-        Election election=electionOptional.get();
-        String contractAddress=election.getContractAddress();
-        return new ResponseEntity<>(votingService.getVotesOfAllCandidatesAsync(contractAddress),HttpStatus.FOUND);
+        Optional<Election> electionOptional = electionRepository.findById(id);
+        if (electionOptional.isEmpty())
+            return new ResponseEntity<>("no election found for the provided id", HttpStatus.NOT_FOUND);
+        Election election = electionOptional.get();
+        String contractAddress = election.getContractAddress();
+        return new ResponseEntity<>(votingService.getVotesOfAllCandidatesAsync(contractAddress), HttpStatus.FOUND);
     }
 
 
@@ -104,18 +106,20 @@ public class VoterService {
     public ResponseEntity<CompletableFuture<String>> voteAsync(Map<String, String> body) throws Exception {
         int id = Integer.parseInt(body.get("id"));
         long candidateId = Long.parseLong(body.get("candidateId"));
-        long voterId=Long.parseLong(body.get("voterId"));
+        long voterId = Long.parseLong(body.get("voterId"));
 
         Optional<Voter> voterOptional = voterRepository.findById(voterId);
-        if(voterOptional.isEmpty())return new ResponseEntity<>(CompletableFuture.failedFuture(new RuntimeException("can't fetch your id, try after sometime")), HttpStatus.CONFLICT);
+        if (voterOptional.isEmpty())
+            return new ResponseEntity<>(CompletableFuture.failedFuture(new RuntimeException("can't fetch your id, try after sometime")), HttpStatus.CONFLICT);
         Voter voter = voterOptional.get();
 
         Optional<Election> electionOptional = electionRepository.findById(id);
-        if(electionOptional.isEmpty())return new ResponseEntity<>(CompletableFuture.failedFuture(new RuntimeException("There is no election with the provided id")), HttpStatus.CONFLICT);
-        Election election=electionOptional.get();
+        if (electionOptional.isEmpty())
+            return new ResponseEntity<>(CompletableFuture.failedFuture(new RuntimeException("There is no election with the provided id")), HttpStatus.CONFLICT);
+        Election election = electionOptional.get();
 
-        String voterAddress=voter.getVoterAddress();
-        String contractAddress=election.getContractAddress();
+        String voterAddress = voter.getVoterAddress();
+        String contractAddress = election.getContractAddress();
 
         if (LocalDateTime.now().isAfter(election.getStartDate())
                 && LocalDateTime.now().isBefore(election.getEndDate())) {
@@ -123,7 +127,8 @@ public class VoterService {
             if (hasVoted(contractAddress, voterAddress, voter)) {
                 return new ResponseEntity<>(CompletableFuture.supplyAsync(() -> {
                     try {
-                        voterRepository.updateHasVotedToTrue(voterId);
+                        voter.setHasVoted(true);
+                        voterRepository.save(voter);
                         return vote(contractAddress, candidateId);
                     } catch (Exception e) {
                         throw new RuntimeException("Error casting vote: " + e.getMessage(), e);

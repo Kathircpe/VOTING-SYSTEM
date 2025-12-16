@@ -223,7 +223,6 @@ public class AdminService {
                         admin.setEmail(email);
                     }
                     case "phoneNumber" -> admin.setPhoneNumber(body.get(key));
-                    case "password" -> admin.setPassword(passwordEncoder.encode(body.get(key)));
                 }
             }
             adminRepository.save(admin);
