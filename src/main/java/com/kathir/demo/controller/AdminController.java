@@ -71,6 +71,7 @@ public class AdminController {
     @GetMapping("/getVotes")
     private ResponseEntity<?> getVotesAsync(@RequestParam int id,@RequestParam int candidateId) {
         Map<String,String> body=new HashMap<>(Map.of("id",""+id,"candidateId",""+candidateId));
+        
         return adminService.getVotesAsync(body);
     }
 

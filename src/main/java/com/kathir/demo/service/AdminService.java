@@ -26,6 +26,7 @@ import org.web3j.tx.gas.ContractGasProvider;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.lang.Integer; 
@@ -194,7 +195,7 @@ public class AdminService {
             return new ResponseEntity<>("no election found for the provided id", HttpStatus.NOT_FOUND);
         String contractAddress = electionOptional.get().getContractAddress();
         body.put("contractAddress", contractAddress);
-        return new ResponseEntity<>(votingService.getVotesAsync(body, false), HttpStatus.FOUND);
+        return new ResponseEntity<>(List.of(votingService.getVotesAsync(body, false)), HttpStatus.FOUND);
     }
 
     public ResponseEntity<?> getVotesOfAllCandidatesAsync(int id) {
