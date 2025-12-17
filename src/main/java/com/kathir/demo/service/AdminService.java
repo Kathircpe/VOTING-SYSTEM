@@ -192,8 +192,11 @@ public class AdminService {
     public ResponseEntity<?> getVotesAsync(Map<String, String> body) {
         Optional<Election> electionOptional = electionRepository.findById(Integer.parseInt(body.get("id")));
         if (electionOptional.isEmpty())
-            return new ResponseEntity<>("no election found for the provided id", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("No election found for the provided id", HttpStatus.NOT_FOUND);
+        if(candidateRepository.findById(Integer.parseInt(body.get("candidateId"))).isEmpty())
+            return new ResponseEntity<>("No candidate found for the provided id", HttpStatus.NOT_FOUND);
         String contractAddress = electionOptional.get().getContractAddress();
+
         body.put("contractAddress", contractAddress);
         return new ResponseEntity<>(List.of(votingService.getVotesAsync(body, false)), HttpStatus.FOUND);
     }
