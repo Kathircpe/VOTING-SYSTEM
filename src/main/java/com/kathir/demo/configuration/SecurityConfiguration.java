@@ -53,9 +53,9 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-
-        config.setAllowedOriginPatterns(Arrays.asList("https://www.voting-portal-rxvf.onrender.com",
-                                                        "https://voting-portal-rxvf.onrender.com"));
+// "https://www.voting-portal-rxvf.onrender.com",
+ // "https://voting-portal-rxvf.onrender.com"
+        config.setAllowedOriginPatterns(Arrays.asList("*"));
 
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"));
         config.setAllowedHeaders(Arrays.asList("*"));

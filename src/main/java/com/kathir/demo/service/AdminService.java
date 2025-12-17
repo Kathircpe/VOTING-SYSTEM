@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.lang.Integer; 
 
 @Data
 @AllArgsConstructor
@@ -188,7 +189,7 @@ public class AdminService {
     }
 
     public ResponseEntity<?> getVotesAsync(Map<String, String> body) {
-        Optional<Election> electionOptional = electionRepository.findByContractAddress(body.get("id"));
+        Optional<Election> electionOptional = electionRepository.findById(Integer.parseInt(body.get("id")));
         if (electionOptional.isEmpty())
             return new ResponseEntity<>("no election found for the provided id", HttpStatus.NOT_FOUND);
         String contractAddress = electionOptional.get().getContractAddress();
