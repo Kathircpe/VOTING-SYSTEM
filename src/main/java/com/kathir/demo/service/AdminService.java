@@ -108,8 +108,8 @@ public class AdminService {
             Election election = electionOptional.get();
             for (String key : body.keySet()) {
                 switch (key) {
-                    case "from" -> election.setStartDate(LocalDateTime.parse(body.get(key)));
-                    case "to" -> election.setEndDate(LocalDateTime.parse(body.get(key)));
+                    case "startDate" -> election.setStartDate(LocalDateTime.parse(body.get(key)));
+                    case "enddate" -> election.setEndDate(LocalDateTime.parse(body.get(key)));
                     case "contractAddress" -> election.setContractAddress(body.get(key));
                     case "electionName" -> election.setElectionName(body.get(key));
                 }
