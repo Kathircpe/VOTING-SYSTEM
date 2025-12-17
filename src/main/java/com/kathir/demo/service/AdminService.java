@@ -109,7 +109,7 @@ public class AdminService {
             for (String key : body.keySet()) {
                 switch (key) {
                     case "startDate" -> election.setStartDate(LocalDateTime.parse(body.get(key)));
-                    case "enddate" -> election.setEndDate(LocalDateTime.parse(body.get(key)));
+                    case "endDate" -> election.setEndDate(LocalDateTime.parse(body.get(key)));
                     case "contractAddress" -> election.setContractAddress(body.get(key));
                     case "electionName" -> election.setElectionName(body.get(key));
                 }
