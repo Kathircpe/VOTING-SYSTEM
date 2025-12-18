@@ -10,5 +10,5 @@ public interface ElectionRepository extends JpaRepository<Election,Integer> {
     Optional<Election> findByContractAddress(String contractAddress);
 
     @Query("SELECT e FROM Election e WHERE e.endDate > CURRENT_TIMESTAMP ORDER BY e.endDate DESC")
-    Optional<Election> finActiveElection();
+    Optional<Election> findActiveElection();
 }

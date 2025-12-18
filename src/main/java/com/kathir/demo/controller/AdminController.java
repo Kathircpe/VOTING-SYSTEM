@@ -34,7 +34,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/deleteElection/{id}")
-    private ResponseEntity<String> deleteElection(@RequestParam int id) {
+    private ResponseEntity<String> deleteElection(@PathVariable int id) {
         return adminService.deleteElection(id);
     }
 

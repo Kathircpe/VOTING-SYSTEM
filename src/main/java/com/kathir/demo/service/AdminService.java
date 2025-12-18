@@ -29,7 +29,9 @@ import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.lang.Integer; 
+import java.lang.Integer;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @Data
 @AllArgsConstructor
@@ -64,14 +66,14 @@ public class AdminService {
         return new ResponseEntity<>(id + " not found", HttpStatus.NOT_FOUND);
     }
 
-    public ResponseEntity<String> createElection(Map<String, String> body) throws Exception {
+    public ResponseEntity<String> createElection(Map<String, String> body){
 
         try {
             String name = body.get("electionName");
             LocalDateTime startDate = LocalDateTime.parse(body.get("startDate"));
             LocalDateTime endDate = LocalDateTime.parse(body.get("endDate"));
 
-            Optional<Election> electionOptional = electionRepository.finActiveElection();
+            Optional<Election> electionOptional = electionRepository.findActiveElection();
             if (electionOptional.isPresent())
                 return new ResponseEntity<>("already there is an active election", HttpStatus.CONFLICT);
 
@@ -79,21 +81,28 @@ public class AdminService {
             election.setEndDate(endDate);
             election.setStartDate(startDate);
             election.setElectionName(name);
-            election.setContractAddress(deploy());
-            electionRepository.save(election);
 
+            CompletableFuture<String> future=deployAsync();
+            try{
+                String contractAddress=future.get(2000, TimeUnit.MILLISECONDS);
+                election.setContractAddress(contractAddress);
+            }catch(TimeoutException e){
+                future.cancel(true);
+                throw e;
+            }
+            electionRepository.save(election);
             //marking hasVoted as false for all voters
             voterRepository.updateAllHasVotedToFalse();
-
             return new ResponseEntity<>("successfully created an election", HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>("error can't create an election", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Error can't create an election", HttpStatus.BAD_REQUEST);
         }
 
     }
 
     public ResponseEntity<String> deleteElection(int id) {
         Optional<Election> electionOptional = electionRepository.findById(id);
+
         if (electionOptional.isPresent()) {
             electionRepository.deleteById(id);
             return new ResponseEntity<>("Successfully deleted the election", HttpStatus.OK);
@@ -170,8 +179,7 @@ public class AdminService {
     public CompletableFuture<String> deployAsync() {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                VotingContract contract = VotingContract.deploy(web3j, credentials, gasProvider).send();
-                return contract.getContractAddress();
+                return deploy();
             } catch (Exception e) {
                 throw new RuntimeException("Error deploying contract: " + e.getMessage(), e);
             }

@@ -26,7 +26,6 @@ public class EmailConfig {
 
     @PostConstruct
     public void init() throws Exception {
-
         getGmailService();
     }
     // This method creates the Gmail service with fresh credentials
