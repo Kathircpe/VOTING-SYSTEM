@@ -49,5 +49,8 @@ public class VotersController {
         return voterService.getVotesOfAllCandidatesAsync(id);
     }
 
-
+    @GetMapping("/getProfile/{id}")
+    private ResponseEntity<?> getProfile(@PathVariable long id) {
+        return voterService.getProfile(id);
+    }
 }

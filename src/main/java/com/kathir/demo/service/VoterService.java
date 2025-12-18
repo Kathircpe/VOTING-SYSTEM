@@ -1,5 +1,6 @@
 package com.kathir.demo.service;
 
+import com.kathir.demo.DTO.UserVoter;
 import com.kathir.demo.contracts.VotingContract;
 import com.kathir.demo.models.Candidate;
 import com.kathir.demo.models.Election;
@@ -37,6 +38,24 @@ public class VoterService {
 
     private final VotingService votingService;
 
+    public ResponseEntity<?> getProfile(long id){
+        try{
+            Voter voter=voterRepository.findById(id).get();
+            UserVoter user = new UserVoter();
+            user.id = voter.getId();
+            user.name = voter.getName();
+            user.email = voter.getEmail();
+            user.phoneNumber = voter.getPhoneNumber();
+            user.age = voter.getAge();
+            user.hasVoted = voter.isHasVoted();
+            user.isEnabled = voter.isEnabled();
+            user.voterAddress = voter.getVoterAddress();
+            return new ResponseEntity<>(Map.of("user", user),HttpStatus.FOUND);
+        }catch(Exception e){
+            return new ResponseEntity<>("something went wrong",HttpStatus.NOT_FOUND);
+        }    
+
+    }
     public ResponseEntity<?> getVoterById(Long id) {
         Optional<Voter> voterOptional = voterRepository.findById(id);
 
@@ -75,7 +94,7 @@ public class VoterService {
                     }
                     case "age" -> voter.setAge(Integer.parseInt(body.get(key)));
                     case "voterAddress" -> voter.setVoterAddress(body.get(key));
-
+                    case "phoneNumber" -> voter.setPhoneNumber(body.get(key));
                 }
 
             }
