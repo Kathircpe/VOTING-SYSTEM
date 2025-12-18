@@ -52,10 +52,12 @@ public class VoterService {
             user.voterAddress = voter.getVoterAddress();
             return new ResponseEntity<>(Map.of("user", user),HttpStatus.FOUND);
         }catch(Exception e){
+            System.out.println(e.getMessage());
             return new ResponseEntity<>("something went wrong",HttpStatus.NOT_FOUND);
         }    
 
     }
+
     public ResponseEntity<?> getVoterById(Long id) {
         Optional<Voter> voterOptional = voterRepository.findById(id);
 
