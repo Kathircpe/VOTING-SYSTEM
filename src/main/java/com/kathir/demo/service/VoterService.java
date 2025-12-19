@@ -128,36 +128,48 @@ public class VoterService {
         int id = Integer.parseInt(body.get("id"));
         long candidateId = Long.parseLong(body.get("candidateId"));
         long voterId = Long.parseLong(body.get("voterId"));
-
+System.out.println("1");
         Optional<Voter> voterOptional = voterRepository.findById(voterId);
         if (voterOptional.isEmpty())
             return new ResponseEntity<>(CompletableFuture.failedFuture(new RuntimeException("can't fetch your id, try after sometime")), HttpStatus.CONFLICT);
         Voter voter = voterOptional.get();
+System.out.println("2");
 
         Optional<Election> electionOptional = electionRepository.findById(id);
         if (electionOptional.isEmpty())
             return new ResponseEntity<>(CompletableFuture.failedFuture(new RuntimeException("There is no election with the provided id")), HttpStatus.CONFLICT);
         Election election = electionOptional.get();
+System.out.println("3");
 
         String voterAddress = voter.getVoterAddress();
         String contractAddress = election.getContractAddress();
+System.out.println("4");
 
         if (LocalDateTime.now().isAfter(election.getStartDate())
                 && LocalDateTime.now().isBefore(election.getEndDate())) {
+        
 
             if (hasVoted(contractAddress, voterAddress, voter)) {
                 return new ResponseEntity<>(CompletableFuture.supplyAsync(() -> {
                     try {
                         voter.setHasVoted(true);
                         voterRepository.save(voter);
+System.out.println("going to vote");
+
                         return vote(contractAddress, candidateId);
                     } catch (Exception e) {
+System.out.println("exception"+e.getMessage());
+
                         throw new RuntimeException("Error casting vote: " + e.getMessage(), e);
                     }
                 }), HttpStatus.CREATED);
             }
+System.out.println("already voted");
+
             return new ResponseEntity<>(CompletableFuture.failedFuture(new RuntimeException("Already voted")), HttpStatus.CONFLICT);
         }
+System.out.println("no election");
+
         return new ResponseEntity<>(CompletableFuture.failedFuture(new RuntimeException("Currently there is no election scheduled")), HttpStatus.CONFLICT);
     }
 
@@ -171,7 +183,10 @@ public class VoterService {
      */
     private String vote(String contractAddress, long candidateId) throws Exception {
         VotingContract contract = votingService.load(contractAddress);
+System.out.println("contract loaded");        
+
         TransactionReceipt receipt = contract.vote(BigInteger.valueOf(candidateId)).send();
+System.out.println("voted in the contract");        
         return receipt.getTransactionHash();
     }
 

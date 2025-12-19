@@ -73,10 +73,7 @@ public class AdminService {
             LocalDateTime startDate = LocalDateTime.parse(body.get("startDate"));
             LocalDateTime endDate = LocalDateTime.parse(body.get("endDate"));
 
-            Optional<Election> electionOptional = electionRepository.findActiveElection();
-            if (electionOptional.isPresent())
-                return new ResponseEntity<>("already there is an active election", HttpStatus.CONFLICT);
-
+          
             Election election = new Election();
             election.setEndDate(endDate);
             election.setStartDate(startDate);
