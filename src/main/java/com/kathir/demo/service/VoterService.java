@@ -20,6 +20,7 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,6 +30,9 @@ import java.util.concurrent.CompletableFuture;
 @AllArgsConstructor
 @Service
 public class VoterService {
+
+    private final ZoneId ZONE_ID=ZoneId.of("Asia/Kolkata");
+    
     @Autowired
     private final VoterRepository voterRepository;
     private final CandidateRepository candidateRepository;
@@ -128,25 +132,25 @@ public class VoterService {
         int id = Integer.parseInt(body.get("id"));
         long candidateId = Long.parseLong(body.get("candidateId"));
         long voterId = Long.parseLong(body.get("voterId"));
-System.out.println("1");
+
         Optional<Voter> voterOptional = voterRepository.findById(voterId);
         if (voterOptional.isEmpty())
             return new ResponseEntity<>(CompletableFuture.failedFuture(new RuntimeException("can't fetch your id, try after sometime")), HttpStatus.CONFLICT);
         Voter voter = voterOptional.get();
-System.out.println("2");
+
 
         Optional<Election> electionOptional = electionRepository.findById(id);
         if (electionOptional.isEmpty())
             return new ResponseEntity<>(CompletableFuture.failedFuture(new RuntimeException("There is no election with the provided id")), HttpStatus.CONFLICT);
         Election election = electionOptional.get();
-System.out.println("3");
+
 
         String voterAddress = voter.getVoterAddress();
         String contractAddress = election.getContractAddress();
-System.out.println("4");
 
-        if (LocalDateTime.now().isAfter(election.getStartDate())
-                && LocalDateTime.now().isBefore(election.getEndDate())) {
+
+        if (LocalDateTime.now(ZONE_ID).isAfter(election.getStartDate())
+                && LocalDateTime.now(ZONE_ID).isBefore(election.getEndDate())) {
         
 
             if (hasVoted(contractAddress, voterAddress, voter)) {
