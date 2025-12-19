@@ -80,18 +80,16 @@ public class AdminService {
             election.setElectionName(name);
 
             CompletableFuture<String> future=deployAsync();
-            try{
-                String contractAddress=future.get(2000, TimeUnit.MILLISECONDS);
+            
+                String contractAddress=future.get();
                 election.setContractAddress(contractAddress);
-            }catch(TimeoutException e){
-                future.cancel(true);
-                throw e;
-            }
+            
             electionRepository.save(election);
             //marking hasVoted as false for all voters
             voterRepository.updateAllHasVotedToFalse();
             return new ResponseEntity<>("successfully created an election", HttpStatus.CREATED);
         } catch (Exception e) {
+System.out.println(e.getMessage());            
             return new ResponseEntity<>("Error can't create an election", HttpStatus.BAD_REQUEST);
         }
 
