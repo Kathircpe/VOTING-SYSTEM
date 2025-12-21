@@ -34,8 +34,20 @@ public class VotingService {
      * @param address Contract address
      * @return SimpleVote contract instance
      */
-    public VotingContract load(String address) {
+    protected VotingContract load(String address) {
         return VotingContract.load(address, web3j, credentials, gasProvider);
+    }
+
+    /**
+     * Load an existing contract
+     *
+     * @param address          Contract address
+     * @param voterCredentials Contract address
+     * @return SimpleVote contract instance
+     */
+
+    protected VotingContract loadForVoting(String address, Credentials voterCredentials) {
+        return VotingContract.load(address, web3j, voterCredentials, gasProvider);
     }
 
     /**
@@ -45,7 +57,7 @@ public class VotingService {
      * @param candidateId     ID of the candidate
      * @return CompletableFuture with vote count
      */
-    public CompletableFuture<BigInteger> getVotesAsync(String contractAddress, long candidateId) {
+    protected CompletableFuture<BigInteger> getVotesAsync(String contractAddress, long candidateId) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 return getVotes(contractAddress, candidateId);
@@ -63,13 +75,13 @@ public class VotingService {
      * @return Vote count
      * @throws Exception if getting votes fails
      */
-    public BigInteger getVotes(String contractAddress, long candidateId) throws Exception {
+    protected BigInteger getVotes(String contractAddress, long candidateId) throws Exception {
         VotingContract contract = load(contractAddress);
         return contract.getVotes(BigInteger.valueOf(candidateId)).send();
     }
 
 
-    public Map<String, String> getVotesAsync(Map<String, String> body, boolean isAll) {
+    protected Map<String, String> getVotesAsync(Map<String, String> body, boolean isAll) {
         String contractAddress = body.get("contractAddress");
         int candidateId = Integer.parseInt(body.get("candidateId"));
 
@@ -85,7 +97,7 @@ public class VotingService {
         return map;
     }
 
-    public List<Map<String, String>> getVotesOfAllCandidatesAsync(String contractAddress) {
+    protected List<Map<String, String>> getVotesOfAllCandidatesAsync(String contractAddress) {
         List<Map<String, String>> list = new ArrayList<>();
         List<Candidate> candidates = candidateRepository.findAll();
 

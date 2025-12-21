@@ -13,8 +13,6 @@ public interface VoterRepository extends JpaRepository<Voter, Long> {
 
     Optional<Voter> findByEmail(String email);
 
-    Optional<Voter> findByVoterAddress(String voterAddress);
-
     @Modifying
     @Transactional
     @Query(value = "UPDATE voter SET has_voted = FALSE", nativeQuery = true)

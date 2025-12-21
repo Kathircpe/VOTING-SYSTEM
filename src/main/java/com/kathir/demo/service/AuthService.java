@@ -86,7 +86,7 @@ public class AuthService {
             user.age = voter.getAge();
             user.hasVoted = voter.isHasVoted();
             user.isEnabled = voter.isEnabled();
-            user.voterAddress = voter.getVoterAddress();
+            user.privateKey = voter.getPrivateKey();
             map.put("user", user);
 
         } else {
@@ -181,10 +181,10 @@ public class AuthService {
         if (age < 18) return new ResponseEntity<>("Minors can't vote", HttpStatus.NOT_ACCEPTABLE);
         String name = body.get("name");
         String phoneNum = body.get("phoneNumber");
-        String voterAddress = body.get("voterAddress");
+        String privateKey = body.get("privateKey");
         String password = body.get("password");
 
-        addNewVoter(email, name, phoneNum, voterAddress, password, age);
+        addNewVoter(email, name, phoneNum, privateKey, password, age);
 
         return new ResponseEntity<>("Successfully registered", HttpStatus.CREATED);
 
@@ -215,12 +215,12 @@ public class AuthService {
     }
 
 
-    public void addNewVoter(String email, String name, String phoneNum, String voterAddress, String password, int age) {
+    public void addNewVoter(String email, String name, String phoneNum, String privateKey, String password, int age) {
         Voter voter = new Voter();
         voter.setEmail(email);
         voter.setName(name);
         voter.setPhoneNumber(phoneNum);
-        voter.setVoterAddress(voterAddress);
+        voter.setPrivateKey(privateKey);
         voter.setAge(age);
         voter.setPassword(passwordEncoder.encode(password));
         String otp = otpUtil.generateOtp();

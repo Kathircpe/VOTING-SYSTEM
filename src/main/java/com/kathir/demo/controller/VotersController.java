@@ -40,7 +40,7 @@ public class VotersController {
     }
 
     @PatchMapping("/vote")
-    private ResponseEntity<CompletableFuture<String>> vote(@RequestBody Map<String, String> body) throws Exception {
+    private ResponseEntity<String> vote(@RequestBody Map<String, String> body) throws Exception {
         return voterService.voteAsync(body);
     }
 

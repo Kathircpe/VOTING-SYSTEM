@@ -37,7 +37,7 @@ public class Voter {
     private String phoneNumber;
     @NotNull
     @NotBlank
-    private String voterAddress; // Blockchain wallet address
+    private String privateKey; // Blockchain wallet private key
 
     private String password;
 

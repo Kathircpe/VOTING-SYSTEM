@@ -14,7 +14,7 @@ public class UserVoter {
         this.isEnabled= voter.isEnabled();
         this.email= voter.getEmail();
         this.phoneNumber= voter.getPhoneNumber();
-        this.voterAddress= voter.getVoterAddress();
+        this.privateKey = voter.getPrivateKey();
 
 
     }
@@ -32,5 +32,5 @@ public class UserVoter {
    
     public String phoneNumber;
    
-    public String voterAddress; // Blockchain wallet address
+    public String privateKey; // Blockchain wallet private key
 }
