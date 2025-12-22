@@ -9,6 +9,7 @@ import com.kathir.demo.utils.JwtUtil;
 import com.kathir.demo.utils.OtpUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import java.util.Optional;
 @Data
 @AllArgsConstructor
 @Service
+@Slf4j
 public class AuthService {
 
     @Autowired
@@ -256,7 +258,10 @@ public class AuthService {
     }
 
     public void ping() {
-        adminRepository.ping();
+        log.info("ping");
+
+        // this makes the connection with db alive for so long which is not suited for free tier
+        // adminRepository.ping();
     }
 
 
